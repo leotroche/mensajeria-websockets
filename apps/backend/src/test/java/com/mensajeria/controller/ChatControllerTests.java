@@ -50,7 +50,7 @@ public class ChatControllerTests {
     static class TestSecurityConfig {
 
         @Bean
-        @Order(Ordered.HIGHEST_PRECEDENCE) // or LOWEST_PRECEDENCE depending on your setup
+        @Order(Ordered.HIGHEST_PRECEDENCE)
         SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
             http
                     .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
