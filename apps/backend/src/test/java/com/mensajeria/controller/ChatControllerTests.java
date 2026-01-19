@@ -3,28 +3,15 @@ package com.mensajeria.controller;
 import com.mensajeria.websocket.Information;
 import com.mensajeria.websocket.Message;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration;
-import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.Ordered;
-import org.springframework.core.convert.support.GenericConversionService;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.ObjectToStringHttpMessageConverter;
 import org.springframework.messaging.converter.*;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -38,26 +25,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Import(ChatControllerTests.TestSecurityConfig.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@EnableAutoConfiguration(exclude = {
-        DataSourceAutoConfiguration.class,
-        HibernateJpaAutoConfiguration.class
-})
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <- only load test config)
 public class ChatControllerTests {
-    @TestConfiguration
-    static class TestSecurityConfig {
-
-        @Bean
-        @Order(Ordered.HIGHEST_PRECEDENCE)
-        SecurityFilterChain testFilterChain(HttpSecurity http) throws Exception {
-            http
-                    .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                    .csrf(AbstractHttpConfigurer::disable);
-            return http.build();
-        }
-    }
 
     @LocalServerPort
     private int port;
@@ -75,6 +44,7 @@ public class ChatControllerTests {
     @Test
     void shouldSendAndReceiveMessage() throws Exception {
         BlockingQueue<Information> blockingQueue = new LinkedBlockingQueue<>();
+
 
         StompSession session = stompClient
                 .connectAsync(
