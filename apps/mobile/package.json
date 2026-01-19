@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "lint": "oxlint --fix . && expo lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "expo": "~54.0.31",
@@ -18,6 +20,10 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "eslint": "^9.0.0",
+    "eslint-config-expo": "~10.0.0",
+    "oxlint": "^1.41.0",
+    "prettier": "^3.8.0",
     "typescript": "~5.9.2"
   },
   "private": true
