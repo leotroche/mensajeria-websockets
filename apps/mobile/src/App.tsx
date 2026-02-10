@@ -1,12 +1,10 @@
-import './App.css'
-
 import { StyleSheet, View } from 'react-native'
 import { Chat } from './pages/Chat/Chat'
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <View style={styles.pageContainer}>
+    <View style={styles.root}>
+      <View style={styles.page}>
         <Chat />
       </View>
     </View>
@@ -14,19 +12,15 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // flex: 1,
-    // backgroundColor: '#fff',
-    borderWidth: 1,
-    width: '75%',
-
+  root: {
     flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
   },
 
-  pageContainer: {
-    width: '75%', // ancho de la página
-    flex: 1, // ocupa alto disponible
+  page: {
+    width: '75%',
     height: '80%',
+    borderWidth: 1,
   },
 })

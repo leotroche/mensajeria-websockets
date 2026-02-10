@@ -1,13 +1,16 @@
 import { View, TextInput, Pressable, GestureResponderEvent, Text, StyleSheet } from 'react-native'
 import { Message } from '../../components/Message'
 import { useState } from 'react'
+import { sendMessage } from '../../config/websocket'
 
 export function Chat() {
   const [color, setColor] = useState('cyan')
 
-  const socket = new WebSocket('ws://localhost:8080')
+  // const socket = new WebSocket('ws://localhost:8080/chats')
 
-  const sendMessage = (evt: GestureResponderEvent) => {}
+  const handleSendMessage = (evt: GestureResponderEvent) => {
+    sendMessage()
+  }
   return (
     <View style={styles.container}>
       {/* HISTORIAL */}
@@ -18,21 +21,9 @@ export function Chat() {
       </View>
 
       {/*  */}
-      <View>
-        <TextInput
-          multiline
-          placeholder="Escribe aquí..."
-          style={{
-            height: 'auto',
-            borderWidth: 1,
-            padding: 10,
-            textAlignVertical: 'top', // Android
-          }}
-        />
-        <Pressable
-          onPress={sendMessage}
-          style={{ backgroundColor: color, padding: 10, marginTop: 10 }}
-        >
+      <View style={styles.messageContainer}>
+        <TextInput multiline placeholder="Escribe aquí..." style={styles.textInput} />
+        <Pressable onPress={handleSendMessage} style={styles.pressable}>
           <Text>Enviar</Text>
         </Pressable>
       </View>
@@ -45,5 +36,26 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     flexDirection: 'column',
+  },
+
+  messageContainer: {
+    gap: 16,
+    flexDirection: 'row',
+  },
+
+  textInput: {
+    width: '80%',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 4,
+
+    paddingLeft: 8,
+    paddingTop: 8,
+  },
+
+  pressable: {
+    backgroundColor: 'cyan',
+    padding: 10,
+    borderRadius: 4,
   },
 })
