@@ -19,8 +19,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chats")
-                .setAllowedOriginPatterns("*") // allow cross-origin requests (optional, but useful for tests)
-                .withSockJS(); // ← THIS is essential for SockJS /info endpoint
+                .setAllowedOriginPatterns("*"); // allow cross-origin requests (optional, but useful for tests)
+//                .withSockJS(); // TODO activar esto para testear
 
     }
 
