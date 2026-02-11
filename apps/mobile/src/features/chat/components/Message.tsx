@@ -1,15 +1,13 @@
-import { ReactNode } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { MessageType } from '../../../types/types'
+import { MessageStatus } from './MessageStatus'
 
-type MessageProps = {
-  children: ReactNode
-  isUserMessage?: boolean
-}
-
-export function Message({ children, isUserMessage = false }: MessageProps) {
+export function Message({ id, text, time, status }: MessageType) {
   return (
-    <View style={[styles.container, isUserMessage ? styles.user : styles.other]}>
-      <Text>{children}</Text>
+    <View style={[styles.container, status === 'sent' ? styles.user : styles.other]}>
+      <Text>{text}</Text>
+      <Text>{time}</Text>
+      <MessageStatus status={status} />
     </View>
   )
 }

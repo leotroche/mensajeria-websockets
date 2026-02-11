@@ -1,29 +1,35 @@
-import { View, TextInput, Pressable, GestureResponderEvent, Text, StyleSheet } from 'react-native'
-import { Message } from '../../components/Message'
-import { useState } from 'react'
-import { sendMessage } from '../../config/websocket'
+import React, { useState } from 'react'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import { UserChat } from '../../features/chat/components/UserChat'
+import { saveMessage } from '../../config/db'
 
 export function Chat() {
-  const [color, setColor] = useState('cyan')
+  const [message, setMessage] = useState('')
 
-  // const socket = new WebSocket('ws://localhost:8080/chats')
+  const sendMessage = async () => {
+    await saveMessage({
+      id: crypto.randomUUID(),
+      text: message,
+      time: new Date().toISOString(),
+      status: 'sent',
+    })
 
-  const handleSendMessage = (evt: GestureResponderEvent) => {
-    sendMessage()
+    console.log('Enviando mensaje:', message)
   }
+
   return (
     <View style={styles.container}>
-      {/* HISTORIAL */}
-      <View>
-        <Message>Hola, ¿cómo estás?</Message>
-        <Message isUserMessage>Estoy bien, gracias. ¿Y tú?</Message>
-        <Message>¡Genial! ¿Qué has estado haciendo?</Message>
-      </View>
+      <UserChat />
 
-      {/*  */}
       <View style={styles.messageContainer}>
-        <TextInput multiline placeholder="Escribe aquí..." style={styles.textInput} />
-        <Pressable onPress={handleSendMessage} style={styles.pressable}>
+        <TextInput
+          multiline
+          placeholder="Escribe aquí..."
+          style={styles.textInput}
+          value={message}
+          onChangeText={setMessage}
+        />
+        <Pressable onPress={sendMessage} style={styles.pressable}>
           <Text>Enviar</Text>
         </Pressable>
       </View>
@@ -36,6 +42,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     flexDirection: 'column',
+  },
+
+  chat: {
+    gap: 8,
   },
 
   messageContainer: {
