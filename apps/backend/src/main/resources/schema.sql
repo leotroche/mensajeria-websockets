@@ -4,7 +4,8 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE users (
                        username CITEXT NOT NULL PRIMARY KEY,
                        password VARCHAR(500) NOT NULL,
-                       enabled BOOLEAN NOT NULL
+                       enabled BOOLEAN NOT NULL,
+                       id SERIAL NOT NULL
 );
 
 CREATE TABLE authorities (

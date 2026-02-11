@@ -1,52 +1,57 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.websocket.Information;
-import com.mensajeria.websocket.Message;
+import com.mensajeria.model.websocket.Information;
+import com.mensajeria.model.websocket.Message;
+import com.mensajeria.security.jwt.dto.LoginRequest;
+import com.mensajeria.security.jwt.dto.LoginResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.messaging.converter.*;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
 import org.springframework.web.socket.sockjs.client.WebSocketTransport;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // <- only load test config)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ChatControllerTests {
+    // TODO revisar que sockJS esté activo
 
     @LocalServerPort
     private int port;
 
+    // STOMP
     private WebSocketStompClient stompClient;
+    private LinkedBlockingQueue<Information> blockingQueue;
+    private StompSession session;
+    @Autowired
+    private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         stompClient = new WebSocketStompClient(
                 new SockJsClient(List.of(new WebSocketTransport(new StandardWebSocketClient())))
         );
         stompClient.setMessageConverter(new JacksonJsonMessageConverter());
-    }
-
-    @Test
-    void shouldSendAndReceiveMessage() throws Exception {
-        BlockingQueue<Information> blockingQueue = new LinkedBlockingQueue<>();
-
-
-        StompSession session = stompClient
+        blockingQueue = new LinkedBlockingQueue<>();
+        session = stompClient
                 .connectAsync(
                         "ws://localhost:" + port + "/chats",
                         new StompSessionHandlerAdapter() {}
@@ -56,13 +61,44 @@ public class ChatControllerTests {
         StompFrameHandler handler = getStompFrameHandler(blockingQueue);
 
         session.subscribe("/topic/canal1", handler);
+    }
 
-        session.send("/app/chat1", new Message("hola fruta"));
+    @Test
+    void shouldSendAndReceiveMessage() throws Exception {
+        session.send("/app/chat1", new Message("anonymous", "hola fruta"));
 
         Information response = blockingQueue.poll(10, TimeUnit.SECONDS);
 
-        assertNotNull(response);
-        assertEquals("hola fruta", response.content());
+        assertEquals("hola fruta", response.text());
+    }
+
+    @Test
+    void sendMessageOnKeyAndReceiveCorrectID() throws Exception {
+
+        WebClient webClient = WebClient.create("http://localhost:" + port); // TODO pasar a .env
+
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("pepe");
+        loginRequest.setPassword("pepe1234");
+
+        String fetchResponse = webClient.post()
+                .uri("/signin")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(loginRequest)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();  // makes it synchronous
+
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(fetchResponse);
+        String username = root.get("username").asString();
+
+        session.send("/app/chat1", new Message(username, "hola fruta"));
+
+        Information response = blockingQueue.poll(10, TimeUnit.SECONDS);
+
+        assertEquals("hola fruta", response.text());
+        assertEquals("1", response.id());
     }
 
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
