@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import org.springframework.web.socket.sockjs.client.SockJsClient;
@@ -46,15 +47,20 @@ public class ChatControllerTests {
 
     @BeforeEach
     void setup() throws Exception {
+//        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+//        headers.add("Authorization", "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwZXBlIiwiaWF0IjoxNzcwOTAzNTc1LCJleHAiOjE3NzA5MjM1NzV9.v2XuQMaBrPWCdfJxPWW-RWWP7iIG3pICUiBoz_MeiPQ");
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.add("Authorization", "Bearer " + "eyeyey");
+
         stompClient = new WebSocketStompClient(
-                new SockJsClient(List.of(new WebSocketTransport(new StandardWebSocketClient())))
-        );
+                new StandardWebSocketClient());
         stompClient.setMessageConverter(new JacksonJsonMessageConverter());
         blockingQueue = new LinkedBlockingQueue<>();
         session = stompClient
                 .connectAsync(
                         "ws://localhost:" + port + "/chats",
-                        new StompSessionHandlerAdapter() {}
+                        new StompSessionHandlerAdapter() {},
+                        stompHeaders
                 )
                 .get(1, TimeUnit.SECONDS);
 
