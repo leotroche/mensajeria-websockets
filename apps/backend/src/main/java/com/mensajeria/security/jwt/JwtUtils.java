@@ -29,14 +29,14 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     public Authentication getAuthentication(String token) {
-        // 1. Parse JWT
-        String username = this.getUserNameFromJwtToken(token); // implement using your JWT library
 
-        // 2. Convert to Spring Authentication
+        String username = this.verifyThenGetUsernameFromJwtToken(token);
+
+        // Authenticate to Spring Security
         return new UsernamePasswordAuthenticationToken(
                 username,
                 null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER")) // adjust roles if needed
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
     }
 
@@ -59,7 +59,8 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token) {
+    public String verifyThenGetUsernameFromJwtToken(String token) {
+        // verifies the auth is valid, then returns the username
         return Jwts.parser()
                 .verifyWith((SecretKey) key())
                 .build().parseSignedClaims(token)
