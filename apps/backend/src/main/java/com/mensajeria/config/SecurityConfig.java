@@ -8,7 +8,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,6 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -44,10 +48,13 @@ public class SecurityConfig {
         return new AuthTokenFilter();
     }
 
+    // normal http manager
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorizeRequests ->
-                authorizeRequests.requestMatchers("/chats/**").permitAll()
+                authorizeRequests
+                        .requestMatchers("/chats/**").permitAll()
+//                        .requestMatchers("/csrf").permitAll()
                         .requestMatchers("/signin").permitAll()
                         .anyRequest().authenticated());
         http.sessionManagement(
@@ -67,6 +74,20 @@ public class SecurityConfig {
 
 
         return http.build();
+    }
+
+    // websockets endpoints manager
+    @Bean
+    public AuthorizationManager<Message<?>> authorizationManager() {
+        MessageMatcherDelegatingAuthorizationManager.Builder builder =
+                MessageMatcherDelegatingAuthorizationManager.builder();
+
+        builder
+                .simpTypeMatchers(SimpMessageType.DISCONNECT, SimpMessageType.CONNECT).permitAll()
+                .simpDestMatchers("/topic/**").permitAll()
+                .anyMessage().authenticated();
+
+        return builder.build();
     }
 
     @Bean
@@ -108,5 +129,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration builder) {
         return builder.getAuthenticationManager();
     }
+
+
 }
 
