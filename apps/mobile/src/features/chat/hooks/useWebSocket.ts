@@ -20,9 +20,30 @@ const onOpenMessage: OnOpenMessage = {
   },
 }
 
+const fetcher = (url: string) =>
+  fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      username: 'pepe',
+      password: 'pepe123',
+    }),
+  }).then((res) => res.json())
+
+export function useAuth() {
+  const [token, setToken] = useState('')
+
+  useEffect(() => {
+    const pepe = fetcher('http://localhost:8080/signin')
+    console.log('pepe', pepe)
+  }, [])
+
+  return token
+}
+
 export function useWebSocket({ url }: UseWebSocketProps) {
   const wsRef = useRef<WebSocket | null>(null)
   const [lastMessage, setLastMessage] = useState<unknown>(null)
+  const token = useAuth()
 
   useEffect(() => {
     const ws = new WebSocket(url)

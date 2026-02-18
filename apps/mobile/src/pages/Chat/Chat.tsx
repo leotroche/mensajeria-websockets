@@ -1,6 +1,7 @@
-import { UserChat } from '@/features/chat/components/UserChat'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 import React, { useRef } from 'react'
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+
+import { UserChat } from '@/features/chat/components/UserChat'
 import { useChat } from '@/features/chat/hooks/useChat'
 
 export function Chat() {
@@ -21,6 +22,9 @@ export function Chat() {
 
   return (
     <View style={styles.container}>
+      <Pressable>Frieren</Pressable>
+      <Pressable>Kokun</Pressable>
+
       <UserChat messages={messages} />
 
       <View style={styles.messageContainer}>
