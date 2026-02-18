@@ -84,7 +84,7 @@ public class ChatControllerTests {
     private static StompHeaders getStompHeaders(String token) {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination("/topic/canal1");
-        stompHeaders.add("authorization", "Bearer " + token);
+        stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
 
@@ -133,8 +133,6 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeaders("123456");
 
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
-
-//        assertThrows(IllegalArgumentException.class, () -> session.subscribe(invalidStompHeaders, handler));
 
         session.subscribe(invalidStompHeaders, handler);
         session.send("/app/chat1", new Message("pepe", "hola fruta"));

@@ -27,7 +27,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
     }
 
     private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
-        String token = accessor.getFirstNativeHeader("authorization");
+        String token = accessor.getFirstNativeHeader("Authorization");
 
         if (!isFormattedBearerToken(token)) throw new IllegalArgumentException("Invalid token");
 
@@ -37,8 +37,6 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
         Authentication auth = jwtUtils.getAuthentication(token);
         accessor.setUser(auth);
-
-
     }
 
     private static boolean isFormattedBearerToken(String token) {
