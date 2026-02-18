@@ -25,7 +25,7 @@ const fetcher = (url: string) =>
     method: 'POST',
     body: JSON.stringify({
       username: 'pepe',
-      password: 'pepe123',
+      password: 'pepe1234',
     }),
   }).then((res) => res.json())
 
@@ -33,7 +33,10 @@ export function useAuth() {
   const [token, setToken] = useState('')
 
   useEffect(() => {
-    const pepe = fetcher('http://localhost:8080/signin')
+    const pepe = fetcher('http://localhost:8080/signin').then(({ token }) => {
+      setToken(token)
+      return token
+    })
     console.log('pepe', pepe)
   }, [])
 
