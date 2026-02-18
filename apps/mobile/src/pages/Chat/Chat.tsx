@@ -1,35 +1,37 @@
-import React, { useState } from 'react'
+import { UserChat } from '@/features/chat/components/UserChat'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
-import { UserChat } from '../../features/chat/components/UserChat'
-import { saveMessage } from '../../config/db'
+import React, { useRef } from 'react'
+import { useChat } from '@/features/chat/hooks/useChat'
 
 export function Chat() {
-  const [message, setMessage] = useState('')
+  const inputRef = useRef<TextInput>(null)
+  const currentText = useRef('')
 
-  const sendMessage = async () => {
-    await saveMessage({
-      id: crypto.randomUUID(),
-      text: message,
-      time: new Date().toISOString(),
-      status: 'sent',
-    })
+  const { messages, send } = useChat()
 
-    console.log('Enviando mensaje:', message)
+  const handleSendMessage = async () => {
+    const text = currentText.current.trim()
+
+    if (!text) return
+
+    send(text)
+    currentText.current = ''
+    inputRef.current?.clear()
   }
 
   return (
     <View style={styles.container}>
-      <UserChat />
+      <UserChat messages={messages} />
 
       <View style={styles.messageContainer}>
         <TextInput
+          ref={inputRef}
           multiline
           placeholder="Escribe aquí..."
           style={styles.textInput}
-          value={message}
-          onChangeText={setMessage}
+          onChangeText={(text) => (currentText.current = text)}
         />
-        <Pressable onPress={sendMessage} style={styles.pressable}>
+        <Pressable onPress={handleSendMessage} style={styles.pressable}>
           <Text>Enviar</Text>
         </Pressable>
       </View>

@@ -1,8 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { MessageType } from '../../../types/types'
-import { MessageStatus } from './MessageStatus'
 
-export function Message({ id, text, time, status }: MessageType) {
+import { MessageStatus } from '@/features/message/components/MessageStatus'
+import { MessageType } from '@/types/types'
+
+interface MessageBoxProps extends MessageType {}
+
+export function Message({ text, time, status }: MessageBoxProps) {
   return (
     <View style={[styles.container, status === 'sent' ? styles.user : styles.other]}>
       <Text>{text}</Text>
@@ -18,12 +21,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     maxWidth: '75%',
   },
-
   user: {
     alignSelf: 'flex-end',
     backgroundColor: '#DCF8C6',
   },
-
   other: {
     alignSelf: 'flex-start',
     backgroundColor: '#E5E5EA',

@@ -1,10 +1,14 @@
 import { StyleSheet, View } from 'react-native'
-import { useChat } from '../hooks/useChat'
-import { Message } from './Message'
 
-export function UserChat() {
-  const { chat } = useChat()
+import { MessageType } from '../../../types/types'
+import { Message } from '@/features/message/components/Message'
 
+
+type UserChatProps = {
+  messages?: MessageType[]
+}
+
+export function UserChat({ messages }: UserChatProps) {
   return (
     <View style={styles.container}>
       <Message id="1" text="Hola, ¿cómo estás?" status="read" time={new Date().toISOString()} />
@@ -21,7 +25,7 @@ export function UserChat() {
         time={new Date().toISOString()}
       />
 
-      {chat?.map(({ id, text, time, status }) => (
+      {messages?.map(({ id, text, time, status }) => (
         <Message key={id} id={id} text={text} time={time} status={status} />
       ))}
     </View>

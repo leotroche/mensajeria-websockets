@@ -1,6 +1,7 @@
 {
   "name": "mobile",
   "version": "1.0.0",
+  "private": true,
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -8,10 +9,11 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "oxlint --fix . && expo lint",
-    "format": "prettier --write ."
+    "fmt": "oxfmt --write ."
   },
   "dependencies": {
     "@stomp/stompjs": "^7.3.0",
+    "dexie": "^4.3.0",
     "expo": "~54.0.31",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
@@ -24,9 +26,8 @@
     "@types/react": "~19.1.0",
     "eslint": "^9.0.0",
     "eslint-config-expo": "~10.0.0",
-    "oxlint": "^1.41.0",
-    "prettier": "^3.8.0",
+    "oxfmt": "^0.32.0",
+    "oxlint": "^1.47.0",
     "typescript": "~5.9.2"
-  },
-  "private": true
+  }
 }

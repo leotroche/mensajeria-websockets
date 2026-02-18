@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native'
+
 import { Chat } from './pages/Chat/Chat'
 
 export default function App() {
