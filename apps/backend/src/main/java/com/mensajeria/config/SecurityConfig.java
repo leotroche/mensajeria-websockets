@@ -73,7 +73,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.addFilterBefore(authenticationJwtTokenFilter(),
                 UsernamePasswordAuthenticationFilter.class);
-        http.cors(AbstractHttpConfigurer::disable); // TODO configurar CORS
+        http.cors(cors -> {}); // TODO configurar CORS
 
 
         return http.build();
