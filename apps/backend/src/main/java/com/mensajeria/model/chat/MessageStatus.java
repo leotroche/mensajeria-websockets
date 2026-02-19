@@ -1,4 +1,4 @@
-package com.mensajeria.model.websocket;
+package com.mensajeria.model.chat;
 
 public enum MessageStatus {
     SENT,

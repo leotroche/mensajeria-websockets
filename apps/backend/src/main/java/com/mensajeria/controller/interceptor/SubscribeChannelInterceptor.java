@@ -1,4 +1,4 @@
-package com.mensajeria.config.interceptor;
+package com.mensajeria.controller.interceptor;
 
 import com.mensajeria.security.jwt.JwtUtils;
 import org.springframework.messaging.Message;

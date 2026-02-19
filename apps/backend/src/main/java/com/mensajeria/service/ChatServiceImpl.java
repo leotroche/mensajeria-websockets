@@ -1,8 +1,8 @@
 package com.mensajeria.service;
 
-import com.mensajeria.model.websocket.Information;
-import com.mensajeria.model.websocket.Message;
-import com.mensajeria.model.websocket.MessageStatus;
+import com.mensajeria.model.chat.Information;
+import com.mensajeria.model.chat.Message;
+import com.mensajeria.model.chat.MessageStatus;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import org.springframework.stereotype.Service;
@@ -24,10 +24,11 @@ public class ChatServiceImpl {
 
 
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(message.senderName());
-        if (user.isEmpty()) return new Information("0", message.body(), LocalDate.now(), MessageStatus.SENT);
+        if (user.isEmpty()) return new Information("0", "This message is not from a valid user.", LocalDate.now(), MessageStatus.SENT);
+        // TODO cambiar por otra cosa
 
-        String userId = String.valueOf(user.get().getId());
+        Long userId = user.get().getId();
 
-        return new Information(userId, message.body(), LocalDate.now(), MessageStatus.SENT);
+        return new Information(String.valueOf(userId), message.body(), LocalDate.now(), MessageStatus.SENT);
     }
 }

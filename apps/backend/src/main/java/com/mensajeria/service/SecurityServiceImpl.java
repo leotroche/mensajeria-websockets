@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,11 +24,13 @@ import java.util.stream.Collectors;
 @Service
 public class SecurityServiceImpl {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public SecurityServiceImpl(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+    }
 
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication;
@@ -44,6 +47,8 @@ public class SecurityServiceImpl {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+
+        if (userDetails == null) throw new IllegalArgumentException("User not found");
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 

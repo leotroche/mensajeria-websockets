@@ -1,4 +1,4 @@
-package com.mensajeria.config.interceptor;
+package com.mensajeria.controller.interceptor;
 
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;

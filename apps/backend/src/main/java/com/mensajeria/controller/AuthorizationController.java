@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 @Controller
 public class AuthorizationController {
 
-    @Autowired
     SecurityServiceImpl securityService;
+
+    public AuthorizationController(SecurityServiceImpl securityService) {
+        this.securityService = securityService;
+    }
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {

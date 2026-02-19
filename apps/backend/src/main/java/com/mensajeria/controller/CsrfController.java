@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CsrfController {
 
     @RequestMapping("/csrf")
-    public CsrfToken csrf(CsrfToken token) {
+    public CsrfToken csrf(CsrfToken token) { // TODO parentemente es para browsers nomás, así que hay que considerar sacarlo
         return token;
     }
 }

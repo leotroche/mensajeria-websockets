@@ -1,7 +1,7 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.model.websocket.Information;
-import com.mensajeria.model.websocket.Message;
+import com.mensajeria.model.chat.Information;
+import com.mensajeria.model.chat.Message;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,11 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.converter.*;
 import org.springframework.messaging.simp.stomp.*;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import tools.jackson.databind.JsonNode;
@@ -25,6 +24,7 @@ import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 public class ChatControllerTests {
 
