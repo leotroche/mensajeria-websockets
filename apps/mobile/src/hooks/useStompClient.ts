@@ -1,7 +1,7 @@
 import { Client, IMessage } from '@stomp/stompjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useUserStore } from '@/store/useUserStore'
+import { useAuthStore } from '@/store/useAuthStore'
 import { MessageType } from '@/types/types'
 
 interface UseStompClientProps {
@@ -12,7 +12,7 @@ export function useStompClient({ brokerURL }: UseStompClientProps) {
   const [lastMessage, setLastMessage] = useState<MessageType | null>(null)
   const clientRef = useRef<Client>(null)
 
-  const token = useUserStore((state) => state.token)
+  const token = useAuthStore((state) => state.token)
 
   useEffect(() => {
     if (!token) return
@@ -47,27 +47,24 @@ export function useStompClient({ brokerURL }: UseStompClientProps) {
     }
   }, [brokerURL, token])
 
-  const sendMessage = useCallback(
-    ({ username, message }: { username: string; message: string }) => {
-      const client = clientRef.current
+  const publish = useCallback(({ username, message }: { username: string; message: string }) => {
+    const client = clientRef.current
 
-      const payload = {
-        senderName: username,
-        body: message,
-      }
+    const payload = {
+      senderName: username,
+      body: message,
+    }
 
-      if (client?.connected) {
-        client.publish({
-          destination: '/app/chat1',
-          body: JSON.stringify(payload),
-        })
-      }
-    },
-    [],
-  )
+    if (client?.connected) {
+      client.publish({
+        destination: '/app/chat1',
+        body: JSON.stringify(payload),
+      })
+    }
+  }, [])
 
   return {
     lastMessage,
-    sendMessage,
+    publish,
   }
 }

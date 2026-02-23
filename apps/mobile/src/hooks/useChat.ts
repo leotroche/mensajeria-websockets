@@ -1,38 +1,27 @@
 import { useEffect, useState } from 'react'
 
-import { env } from '@/config/env'
 import { useStompClient } from '@/hooks/useStompClient'
-import { useAuthStore } from '@/store/useUserStore'
+import { useAuthStore } from '@/store/useAuthStore'
 import { MessageType } from '@/types/types'
 
 export function useChat() {
-  const token = useAuthStore((s) => s.token)
   const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
 
-  const { lastMessage, sendMessage: publish } = useStompClient({
-    brokerURL: `${env.WEB_SOCKET_BASE_URL}/chats`,
-  })
+  const { lastMessage, publish } = useStompClient({ brokerURL: 'ws://localhost:8080/chats' })
 
-  const [messages, setMessages] = useState<MessageType[]>([])
+  const [optimisticMessages, setOptimisticMessages] = useState<MessageType[]>([])
 
-  // Cuando llega mensaje del server
   useEffect(() => {
     if (!lastMessage) return
-    setMessages((prev) => [...prev, lastMessage])
+    console.log('Received message:', lastMessage)
+    setOptimisticMessages((prev) => [...prev, lastMessage])
   }, [lastMessage])
-
-  // Si se hace logout, limpiar mensajes
-  useEffect(() => {
-    if (!token) {
-      setMessages([])
-    }
-  }, [token])
 
   function sendMessage(text: string) {
     if (!user || !token) return
 
-    // Optimistic update simple (esto ya es suficiente)
-    setMessages((prev) => [
+    setOptimisticMessages((prev) => [
       ...prev,
       {
         id: crypto.randomUUID(),
@@ -48,5 +37,5 @@ export function useChat() {
     })
   }
 
-  return { messages, sendMessage }
+  return { messages: optimisticMessages, sendMessage }
 }

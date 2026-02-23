@@ -7,11 +7,11 @@ type UserChatProps = {
   messages?: MessageType[]
 }
 
-export function UserChat({ messages }: UserChatProps) {
+export function ChatBox({ messages }: UserChatProps) {
   return (
     <View style={styles.container}>
-      {messages?.map(({ id, text, time, status }) => (
-        <Message key={id} id={id} text={text} time={time} status={status} />
+      {messages?.map(({ id, text, time }) => (
+        <Message key={id} id={id} text={text} time={time} />
       ))}
     </View>
   )

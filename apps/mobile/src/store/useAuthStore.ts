@@ -10,6 +10,7 @@ type User = {
 type AuthState = {
   user: User | null
   token: string | null
+
   login: (user: User, token: string) => void
   logout: () => void
 }

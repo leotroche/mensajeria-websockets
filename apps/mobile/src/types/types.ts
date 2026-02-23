@@ -3,16 +3,16 @@ export type ChatType = {
   name: string
   messages: MessageType[]
   time: string
-  status: ChatStatusType
+  // status: ChatStatusType
 }
 
-type ChatStatusType = 'online' | 'offline' | 'typing'
+// type ChatStatusType = 'online' | 'offline' | 'typing'
 
 export type MessageType = {
   id: string
   text: string
   time: string
-  status: MessageStatusType
+  // status: MessageStatusType
 }
 
-export type MessageStatusType = 'sent' | 'received' | 'read'
+// export type MessageStatusType = 'sent' | 'received' | 'read'
