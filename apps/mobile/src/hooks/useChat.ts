@@ -1,3 +1,5 @@
+/* oxlint-disable eslint-plugin-react-hooks(exhaustive-deps) */
+
 import { useEffect, useState } from 'react'
 
 import { env } from '@/config/env'
@@ -21,9 +23,10 @@ export function useChat(token: string) {
 
   useEffect(() => {
     if (lastMessage) {
+      console.log('Nuevo mensaje recibido:', lastMessage)
       saveMessage(lastMessage)
     }
-  }, [lastMessage, saveMessage])
+  }, [lastMessage])
 
   const dispatchMessage = ({ username, message }: { username: string; message: string }) => {
     sendMessage({ username, message })

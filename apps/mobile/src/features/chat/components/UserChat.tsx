@@ -1,8 +1,7 @@
 import { StyleSheet, View } from 'react-native'
 
 import { Message } from '@/features/message/components/Message'
-
-import { MessageType } from '../../../types/types'
+import { MessageType } from '@/types/types'
 
 type UserChatProps = {
   messages?: MessageType[]

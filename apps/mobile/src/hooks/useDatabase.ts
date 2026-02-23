@@ -28,9 +28,11 @@ export function useDatabase({ dbName = 'MyDatabase' }) {
     return await db.table('messages').orderBy('time').toArray()
   }
 
-  const saveMessage = async ({ id, text, time, status }: MessageType) => {
+  const saveMessage = async ({ id; userId, text, time }: MessageType) => {
     const db = getDb()
-    await db.table('messages').put({ id, text, time, status })
+    await db
+      .table('messages')
+      .add({ id: "crypto.asdfa", text, time: new Date().toISOString(), status })
   }
 
   return {

@@ -6,7 +6,7 @@ import { UserChat } from '@/features/chat/components/UserChat'
 import { useChat } from '@/hooks/useChat'
 import { getToken } from '@/services/getToken'
 
-export function Chat() {
+export function ChatPage() {
   const inputRef = useRef<TextInput>(null)
   const currentText = useRef('')
 

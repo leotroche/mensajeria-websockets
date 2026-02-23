@@ -1,12 +1,12 @@
 import { Pressable, StyleSheet, View } from 'react-native'
 
-import { Chat } from './pages/Chat/Chat'
+import { ChatPage } from './pages/ChatPage'
 
 export default function App() {
   return (
     <View style={styles.root}>
       <View style={styles.page}>
-        <Chat />
+        <ChatPage />
       </View>
     </View>
   )
