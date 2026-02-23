@@ -13,15 +13,12 @@ export function MessageStatus({ status }: MessageStatusProps) {
     read: '✓✓',
   }
 
-  
   return (
     <View style={styles.container}>
       <Text style={[styles.base, statusStyles[status]]}>{TEXT[status]}</Text>
     </View>
   )
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
