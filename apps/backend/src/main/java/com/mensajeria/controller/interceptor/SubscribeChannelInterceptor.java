@@ -19,6 +19,7 @@ public class SubscribeChannelInterceptor implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        // TODO Considerar interceptar los SEND para validar su token
 
         if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) return message;
 

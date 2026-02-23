@@ -124,7 +124,7 @@ public class ChatControllerTests {
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertEquals("hola fruta", response.text());
-        assertEquals("1", response.id());
+        assertEquals("1", response.userId());
     }
 
     @Test
