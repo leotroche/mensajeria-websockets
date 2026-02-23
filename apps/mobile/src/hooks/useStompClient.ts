@@ -1,16 +1,18 @@
 import { Client, IMessage } from '@stomp/stompjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import { useUserStore } from '@/store/useUserStore'
 import { MessageType } from '@/types/types'
 
 interface UseStompClientProps {
   brokerURL: string
-  token: string
 }
 
-export function useStompClient({ brokerURL, token }: UseStompClientProps) {
+export function useStompClient({ brokerURL }: UseStompClientProps) {
   const [lastMessage, setLastMessage] = useState<MessageType | null>(null)
   const clientRef = useRef<Client>(null)
+
+  const token = useUserStore((state) => state.token)
 
   useEffect(() => {
     if (!token) return

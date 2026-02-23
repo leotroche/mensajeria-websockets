@@ -1,39 +1,52 @@
-/* oxlint-disable eslint-plugin-react-hooks(exhaustive-deps) */
-
 import { useEffect, useState } from 'react'
 
 import { env } from '@/config/env'
-import { useDatabase } from '@/hooks/useDatabase'
 import { useStompClient } from '@/hooks/useStompClient'
+import { useAuthStore } from '@/store/useUserStore'
 import { MessageType } from '@/types/types'
 
-export function useChat(token: string) {
-  const { lastMessage, sendMessage } = useStompClient({
-    brokerURL: `${env.WEB_SOCKET_BASE_URL}/chats`,
-    token,
-  })
+export function useChat() {
+  const token = useAuthStore((s) => s.token)
+  const user = useAuthStore((s) => s.user)
 
-  const { getStoredMessages, saveMessage } = useDatabase({ dbName: 'ChatDatabase' })
+  const { lastMessage, sendMessage: publish } = useStompClient({
+    brokerURL: `${env.WEB_SOCKET_BASE_URL}/chats`,
+  })
 
   const [messages, setMessages] = useState<MessageType[]>([])
 
+  // Cuando llega mensaje del server
   useEffect(() => {
-    getStoredMessages().then(setMessages)
-  }, [getStoredMessages])
-
-  useEffect(() => {
-    if (lastMessage) {
-      console.log('Nuevo mensaje recibido:', lastMessage)
-      saveMessage(lastMessage)
-    }
+    if (!lastMessage) return
+    setMessages((prev) => [...prev, lastMessage])
   }, [lastMessage])
 
-  const dispatchMessage = ({ username, message }: { username: string; message: string }) => {
-    sendMessage({ username, message })
+  // Si se hace logout, limpiar mensajes
+  useEffect(() => {
+    if (!token) {
+      setMessages([])
+    }
+  }, [token])
+
+  function sendMessage(text: string) {
+    if (!user || !token) return
+
+    // Optimistic update simple (esto ya es suficiente)
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        text,
+        time: new Date().toISOString(),
+        status: 'sent',
+      },
+    ])
+
+    publish({
+      username: user.username,
+      message: text,
+    })
   }
 
-  return {
-    messages,
-    sendMessage: dispatchMessage,
-  }
+  return { messages, sendMessage }
 }

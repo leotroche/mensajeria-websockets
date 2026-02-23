@@ -1,57 +1,80 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 
 import { LoginButton } from '@/components/LoginButton'
 import { UserChat } from '@/features/chat/components/UserChat'
 import { useChat } from '@/hooks/useChat'
 import { getToken } from '@/services/getToken'
+import { useAuthStore } from '@/store/useUserStore'
 
 export function ChatPage() {
   const inputRef = useRef<TextInput>(null)
   const currentText = useRef('')
 
-  const [token, setToken] = useState('')
-  const [username, setUsername] = useState('')
+  // 🔐 Estado global
+  const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
+  const login = useAuthStore((s) => s.login)
+  const logout = useAuthStore((s) => s.logout)
 
-  const { messages, sendMessage } = useChat(token)
+  const { messages, sendMessage } = useChat()
 
   const handleSendMessage = () => {
     const text = currentText.current.trim()
-    if (!text || !username) return
+    if (!text || !user) return
 
-    sendMessage({ username, message: text })
+    sendMessage({
+      username: user.username,
+      message: text,
+    })
 
     currentText.current = ''
     inputRef.current?.clear()
   }
 
   const handleOnPress = async (username: string, password: string) => {
-    const token = await getToken({ username, password })
-    setToken(token)
-    setUsername(username)
+    try {
+      const token = await getToken({ username, password })
+
+      login({ userId: username, username }, token)
+    } catch (error) {
+      console.error('Login error', error)
+    }
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.box}>
-        <LoginButton onPress={() => handleOnPress('pepe', 'pepe1234')}>Goku</LoginButton>
-        <LoginButton onPress={() => handleOnPress('pepa', '1234pepe')}>Vegeta</LoginButton>
-      </View>
+      {/* 🔐 Si no está autenticado */}
+      {!token && (
+        <View style={styles.box}>
+          <LoginButton onPress={() => handleOnPress('pepe', 'pepe1234')}>Goku</LoginButton>
+          <LoginButton onPress={() => handleOnPress('pepa', '1234pepe')}>Vegeta</LoginButton>
+        </View>
+      )}
 
-      <UserChat messages={messages} />
+      {/* 💬 Chat solo si está autenticado */}
+      {token && (
+        <>
+          <UserChat messages={messages} />
 
-      <View style={styles.messageContainer}>
-        <TextInput
-          ref={inputRef}
-          multiline
-          placeholder="Escribe aquí..."
-          style={styles.textInput}
-          onChangeText={(text) => (currentText.current = text)}
-        />
-        <Pressable onPress={handleSendMessage} style={styles.pressable}>
-          <Text>Enviar</Text>
-        </Pressable>
-      </View>
+          <View style={styles.messageContainer}>
+            <TextInput
+              ref={inputRef}
+              multiline
+              placeholder="Escribe aquí..."
+              style={styles.textInput}
+              onChangeText={(text) => (currentText.current = text)}
+            />
+            <Pressable onPress={handleSendMessage} style={styles.pressable}>
+              <Text>Enviar</Text>
+            </Pressable>
+          </View>
+
+          <Pressable onPress={logout}>
+            <Text>Cerrar sesión</Text>
+          </Pressable>
+        </>
+      )}
     </View>
   )
 }
