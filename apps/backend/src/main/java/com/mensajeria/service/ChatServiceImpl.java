@@ -24,10 +24,19 @@ public class ChatServiceImpl {
 
 
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(message.senderName());
+<<<<<<< HEAD
         if (user.isEmpty()) return new Information("0", message.body(), LocalDate.now(), MessageStatus.SENT);
+=======
+        if (user.isEmpty()) return new Information("0", "This message is not from a valid user.");
+        // TODO cambiar por otra cosa
+>>>>>>> dev
 
         String userId = String.valueOf(user.get().getId());
 
+<<<<<<< HEAD
         return new Information(userId, message.body(), LocalDate.now(), MessageStatus.SENT);
+=======
+        return new Information(String.valueOf(userId), message.body());
+>>>>>>> dev
     }
 }
