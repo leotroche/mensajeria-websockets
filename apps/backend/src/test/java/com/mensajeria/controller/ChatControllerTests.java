@@ -35,7 +35,10 @@ public class ChatControllerTests {
     private WebSocketStompClient stompClient;
     private LinkedBlockingQueue<Information> blockingQueue;
     private StompSession session;
-    private StompHeaders validStompHeaders;
+
+    private StompHeaders validStompHeadersForSubscribe;
+    private StompHeaders validStompHeadersForSend;
+
     private String token;
     StompFrameHandler handler;
 
@@ -63,7 +66,8 @@ public class ChatControllerTests {
 
         token = getToken(webClient, loginRequest);
 
-        validStompHeaders = getStompHeaders(token);
+        validStompHeadersForSubscribe = getStompHeadersForSubscribe(token);
+        validStompHeadersForSend = getStompHeadersForSend(token);
 
         connectToChat();
 
@@ -80,13 +84,21 @@ public class ChatControllerTests {
                 .connectAsync(
                         "ws://localhost:" + port + "/chats", // TODO pasar a .env
                         new StompSessionHandlerAdapter() {}
+                        // no andan los headers en esta librería
                 )
                 .get(1, TimeUnit.SECONDS);
     }
 
-    private static StompHeaders getStompHeaders(String token) {
+    private static StompHeaders getStompHeadersForSubscribe(String token) {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination("/topic/canal1");
+        stompHeaders.add("Authorization", "Bearer " + token);
+        return stompHeaders;
+    }
+
+    private static StompHeaders getStompHeadersForSend(String token) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/app/chat1");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -108,9 +120,9 @@ public class ChatControllerTests {
     @Test
     void shouldSendAndReceiveMessage() throws Exception {
 
-        session.subscribe(validStompHeaders, handler);
+        session.subscribe(validStompHeadersForSubscribe, handler);
 
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -120,9 +132,9 @@ public class ChatControllerTests {
     @Test
     void sendMessageOnKeyAndReceiveCorrectID() throws Exception {
 
-        session.subscribe(validStompHeaders, handler);
+        session.subscribe(validStompHeadersForSubscribe, handler);
 
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -133,12 +145,12 @@ public class ChatControllerTests {
     @Test
     void invalidTokenCantSubscribe() throws Exception {
 
-        invalidStompHeaders = getStompHeaders("123456");
+        invalidStompHeaders = getStompHeadersForSubscribe("123456");
 
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -148,10 +160,10 @@ public class ChatControllerTests {
     @Test
     void emptyTokenCantSubscribe() throws InterruptedException {
 
-        invalidStompHeaders =  getStompHeaders("");
+        invalidStompHeaders = getStompHeadersForSubscribe("");
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -161,10 +173,10 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSubscribeWithExtra() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeaders(token + "3");
+        invalidStompHeaders = getStompHeadersForSubscribe(token + "3");
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -174,10 +186,65 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSubscribeWithOneLess() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeaders(token.substring(0,1));
+        invalidStompHeaders = getStompHeadersForSubscribe(token.substring(0,1));
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send("/app/chat1", new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+
+        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNull(response); // no response means it didnt connect
+    }
+
+
+    @Test
+    void invalidTokenCantSendMessage() throws Exception {
+
+        invalidStompHeaders = getStompHeadersForSend("123456");
+
+        LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
+
+        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+
+        StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNull(response); // no response means it didnt connect
+    }
+
+    @Test
+    void emptyTokenCantSendMessage() throws InterruptedException {
+
+        invalidStompHeaders = getStompHeadersForSend("");
+
+        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+
+        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNull(response); // no response means it didnt connect
+    }
+
+    @Test
+    void almostValidTokenCantSendMessageWithExtra() throws InterruptedException {
+
+        invalidStompHeaders = getStompHeadersForSend(token + "3");
+
+        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+
+        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNull(response); // no response means it didnt connect
+    }
+
+    @Test
+    void almostValidTokenCantSendMessageWithOneLess() throws InterruptedException {
+
+        invalidStompHeaders = getStompHeadersForSend(token.substring(0,1));
+
+        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 

@@ -1,10 +1,8 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.security.jwt.JwtUtils;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import com.mensajeria.security.jwt.dto.LoginResponse;
 import com.mensajeria.service.SecurityServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
