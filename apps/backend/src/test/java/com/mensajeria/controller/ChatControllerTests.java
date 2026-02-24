@@ -47,6 +47,9 @@ public class ChatControllerTests {
 
     @BeforeEach
     void setup() throws Exception {
+
+//        Thread.sleep(5000);
+
         WebClient webClient = WebClient.create("http://localhost:" + port);
 //        String csrfResponse = webClient.get() // TODO analizar CSRF
 //                .uri("/csrf")
@@ -99,7 +102,7 @@ public class ChatControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        return root.get("secret").asString();
+        return root.get("token").asString();
     }
 
     @Test
