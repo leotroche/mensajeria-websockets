@@ -1,7 +1,7 @@
 package com.mensajeria.config.websocket;
 
 
-import com.mensajeria.controller.interceptor.SubscribeChannelInterceptor;
+import com.mensajeria.interceptor.SubscribeChannelInterceptor;
 import com.mensajeria.security.jwt.JwtUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
