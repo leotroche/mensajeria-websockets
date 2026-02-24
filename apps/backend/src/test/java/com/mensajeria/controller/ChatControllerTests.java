@@ -122,7 +122,7 @@ public class ChatControllerTests {
 
         session.subscribe(validStompHeadersForSubscribe, handler);
 
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -134,7 +134,7 @@ public class ChatControllerTests {
 
         session.subscribe(validStompHeadersForSubscribe, handler);
 
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -150,7 +150,7 @@ public class ChatControllerTests {
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -163,7 +163,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe("");
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -176,7 +176,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe(token + "3");
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -189,7 +189,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe(token.substring(0,1));
 
         session.subscribe(invalidStompHeaders, handler);
-        session.send(validStompHeadersForSend, new Message("pepe", "hola fruta"));
+        session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -205,7 +205,7 @@ public class ChatControllerTests {
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
         session.subscribe(validStompHeadersForSubscribe, handler);
-        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+        session.send(invalidStompHeaders, new Message("hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -218,7 +218,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend("");
 
         session.subscribe(validStompHeadersForSubscribe, handler);
-        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+        session.send(invalidStompHeaders, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -231,7 +231,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend(token + "3");
 
         session.subscribe(validStompHeadersForSubscribe, handler);
-        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+        session.send(invalidStompHeaders, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -244,7 +244,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend(token.substring(0,1));
 
         session.subscribe(validStompHeadersForSubscribe, handler);
-        session.send(invalidStompHeaders, new Message("pepe", "hola fruta"));
+        session.send(invalidStompHeaders, new Message("hola fruta"));
 
         Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
 
