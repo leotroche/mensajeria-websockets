@@ -1,5 +1,7 @@
 package com.mensajeria.service;
 
+import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
+import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import com.mensajeria.security.jwt.JwtUtils;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import com.mensajeria.security.jwt.dto.LoginResponse;
@@ -18,16 +20,21 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class SecurityServiceImpl {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
+    private final UserDAOJPA userDAOJPA;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    public SecurityServiceImpl(AuthenticationManager authenticationManager, JwtUtils jwtUtils, UserDAOJPA userDAOJPA) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtils = jwtUtils;
+        this.userDAOJPA = userDAOJPA;
+    }
 
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication;
@@ -45,12 +52,15 @@ public class SecurityServiceImpl {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
+        if (userDetails == null) throw new IllegalArgumentException("User not found");
+        String userId = String.valueOf(userDAOJPA.findById(loginRequest.getUsername()).get().getId()); // TODO se puede mejorar?
+
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
-        return new LoginResponse(userDetails.getUsername(), roles, jwtToken);
+        return new LoginResponse(userDetails.getUsername(), userId, roles, jwtToken);
     }
 }
