@@ -1,5 +1,5 @@
 import { Client, IMessage } from '@stomp/stompjs'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { useAuthStore } from '@/store/useAuthStore'
 import { MessageType } from '@/types/types'
@@ -9,10 +9,11 @@ interface UseStompClientProps {
 }
 
 export function useStompClient({ brokerURL }: UseStompClientProps) {
+  const user = useAuthStore((s) => s.user)
+  const token = useAuthStore((s) => s.token)
+
   const [lastMessage, setLastMessage] = useState<MessageType | null>(null)
   const clientRef = useRef<Client>(null)
-
-  const token = useAuthStore((state) => state.token)
 
   useEffect(() => {
     if (!token) return
@@ -47,11 +48,11 @@ export function useStompClient({ brokerURL }: UseStompClientProps) {
     }
   }, [brokerURL, token])
 
-  const publish = useCallback(({ username, message }: { username: string; message: string }) => {
+  const publish = (message: string) => {
     const client = clientRef.current
 
     const payload = {
-      senderName: username,
+      senderName: user?.username,
       body: message,
     }
 
@@ -61,7 +62,7 @@ export function useStompClient({ brokerURL }: UseStompClientProps) {
         body: JSON.stringify(payload),
       })
     }
-  }, [])
+  }
 
   return {
     lastMessage,

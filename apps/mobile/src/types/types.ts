@@ -9,10 +9,10 @@ export type ChatType = {
 // type ChatStatusType = 'online' | 'offline' | 'typing'
 
 export type MessageType = {
+  userId: string
   id: string
   text: string
   time: string
-  // status: MessageStatusType
 }
 
 // export type MessageStatusType = 'sent' | 'received' | 'read'

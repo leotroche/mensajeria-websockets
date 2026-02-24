@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 
 import { LoginButton } from './components/LoginButton'
-import { HomePage } from './pages/HomePage'
-import { getToken } from './services/getToken'
+import { HomeScreen } from './pages/HomeScreen'
+import { loginAPI } from './services/loginAPI'
 import { useAuthStore } from './store/useAuthStore'
 
 export default function App() {
@@ -14,10 +14,8 @@ export default function App() {
   const isAuthenticated = !!token
 
   const handleOnPress = async (username: string, password: string) => {
-    const userId = crypto.randomUUID()
-    const token = await getToken({ username, password })
-
-    login({ userId, username }, token)
+    const { token } = await loginAPI(username, password)
+    login({ userId: username === 'pepe' ? '1' : '2', username }, token)
   }
 
   if (!isAuthenticated) {
@@ -39,7 +37,7 @@ export default function App() {
       </View>
       <View style={styles.container}>
         <View style={styles.page}>
-          <HomePage />
+          <HomeScreen />
         </View>
       </View>
     </>

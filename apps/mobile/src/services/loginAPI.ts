@@ -1,9 +1,10 @@
-interface UserData {
+interface LoginResponse {
+  userId: string
   username: string
-  password: string
+  secret: string
 }
 
-export const getToken = async ({ username, password }: UserData) => {
+export const loginAPI = async (username: string, password: string) => {
   const response = await fetch('http://localhost:8080/signin', {
     method: 'POST',
     body: JSON.stringify({ username, password }),
@@ -16,6 +17,11 @@ export const getToken = async ({ username, password }: UserData) => {
     throw new Error('Failed to fetch token')
   }
 
-  const data = await response.json()
-  return data.secret
+  const data: LoginResponse = await response.json()
+
+  return {
+    userId: data.userId,
+    username: data.username,
+    token: data.secret,
+  }
 }

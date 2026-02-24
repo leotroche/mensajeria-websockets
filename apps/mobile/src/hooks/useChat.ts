@@ -1,41 +1,31 @@
-import { useEffect, useState } from 'react'
+// oxlint-disable eslint-plugin-react-hooks/exhaustive-deps
+
+import { useEffect } from 'react'
 
 import { useStompClient } from '@/hooks/useStompClient'
 import { useAuthStore } from '@/store/useAuthStore'
-import { MessageType } from '@/types/types'
+
+import { useDexieDB } from './useDexieDB'
 
 export function useChat() {
   const user = useAuthStore((s) => s.user)
-  const token = useAuthStore((s) => s.token)
+
+  if (!user) {
+    throw new Error('Usuario no autenticado')
+  }
 
   const { lastMessage, publish } = useStompClient({ brokerURL: 'ws://localhost:8080/chats' })
-
-  const [optimisticMessages, setOptimisticMessages] = useState<MessageType[]>([])
+  const { messages, addMessage } = useDexieDB()
 
   useEffect(() => {
     if (!lastMessage) return
-    console.log('Received message:', lastMessage)
-    setOptimisticMessages((prev) => [...prev, lastMessage])
+    addMessage({
+      ...lastMessage,
+      userId: user.userId,
+      id: crypto.randomUUID(),
+      time: new Date().toLocaleTimeString(),
+    })
   }, [lastMessage])
 
-  function sendMessage(text: string) {
-    if (!user || !token) return
-
-    setOptimisticMessages((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        text,
-        time: new Date().toISOString(),
-        status: 'sent',
-      },
-    ])
-
-    publish({
-      username: user.username,
-      message: text,
-    })
-  }
-
-  return { messages: optimisticMessages, sendMessage }
+  return { messages, sendMessage: publish }
 }

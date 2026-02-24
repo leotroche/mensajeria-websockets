@@ -1,16 +1,28 @@
 import { StyleSheet, Text, View } from 'react-native'
 
-import { MessageStatus } from '@/features/message/components/MessageStatus'
+import { useAuthStore } from '@/store/useAuthStore'
 import { MessageType } from '@/types/types'
 
 interface MessageBoxProps extends MessageType {}
 
-export function Message({ text, time, status }: MessageBoxProps) {
+export function Message({ userId, id, text, time }: MessageBoxProps) {
+  const user = useAuthStore((s) => s.user)
+
+  const props = {
+    userId,
+    id,
+  }
+
+  console.table({
+    props,
+
+    user,
+  })
+
   return (
-    <View style={[styles.container, status === 'sent' ? styles.user : styles.other]}>
+    <View style={[styles.container, userId === user?.userId ? styles.user : styles.other]}>
       <Text>{text}</Text>
       <Text>{time}</Text>
-      <MessageStatus status={status} />
     </View>
   )
 }

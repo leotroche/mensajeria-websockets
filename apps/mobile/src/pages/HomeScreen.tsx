@@ -5,7 +5,7 @@ import { ChatBox } from '@/components/chat/ChatBox'
 import { useChat } from '@/hooks/useChat'
 import { useAuthStore } from '@/store/useAuthStore'
 
-export function HomePage() {
+export function HomeScreen() {
   const user = useAuthStore((s) => s.user)
 
   const inputRef = useRef<TextInput>(null)
