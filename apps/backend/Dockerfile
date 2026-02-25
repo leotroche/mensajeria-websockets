@@ -15,7 +15,7 @@ FROM eclipse-temurin:25-jdk-jammy AS development
 RUN apt-get update && apt-get install -y maven
 
 WORKDIR /app
-COPY --from=build /app/target/mensajeria.jar app.jar
+COPY --from=build /app/target/mensajeria-0.0.1-SNAPSHOT.jar app.jar
 COPY --from=build /app/src ./src
 COPY --from=build /app/pom.xml .
 
