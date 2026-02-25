@@ -8,17 +8,6 @@ interface MessageBoxProps extends MessageType {}
 export function Message({ userId, id, text, time }: MessageBoxProps) {
   const user = useAuthStore((s) => s.user)
 
-  const props = {
-    userId,
-    id,
-  }
-
-  console.table({
-    props,
-
-    user,
-  })
-
   return (
     <View style={[styles.container, userId === user?.userId ? styles.user : styles.other]}>
       <Text>{text}</Text>

@@ -1,7 +1,8 @@
 interface LoginResponse {
   userId: string
   username: string
-  secret: string
+  token: string
+  errors: Error[]
 }
 
 export const loginAPI = async (username: string, password: string) => {
@@ -19,9 +20,7 @@ export const loginAPI = async (username: string, password: string) => {
 
   const data: LoginResponse = await response.json()
 
-  return {
-    userId: data.userId,
-    username: data.username,
-    token: data.secret,
-  }
+  console.log('Login API response: >>>>>>>>>>>>>>>>>>', data)
+
+  return data
 }

@@ -1,0 +1,37 @@
+[
+  {
+    "contactId": "1",
+    "name": "Goku",
+    "avatar": "https://i.pinimg.com/736x/41/19/12/411912a0598fbae0462b0136c3e978ca.jpg",
+    "lastMessage": "Choqué la moto",
+    "time": "12:30"
+  },
+  {
+    "contactId": "2",
+    "name": "Vegeta",
+    "avatar": "https://i.pinimg.com/736x/88/96/67/8896678b715c534f913174efff7e3f41.jpg",
+    "lastMessage": "Ya vete del ciber",
+    "time": "11:45"
+  },
+  {
+    "contactId": "3",
+    "name": "Gohan",
+    "avatar": "https://i.pinimg.com/736x/93/85/29/93852940330962687c2aca567b6f0f81.jpg",
+    "lastMessage": "XD",
+    "time": "10:15"
+  },
+  {
+    "contactId": "4",
+    "name": "Bills",
+    "avatar": "https://i.pinimg.com/736x/fb/51/47/fb51472985d68354ca38e95adb70f323.jpg",
+    "lastMessage": "Eta vaina e seria",
+    "time": "09:00"
+  },
+  {
+    "contactId": "5",
+    "name": "Frieren",
+    "avatar": "https://i.pinimg.com/236x/92/f2/dc/92f2dc1ff01b9a44167650da986bf145.jpg",
+    "lastMessage": "...",
+    "time": "08:30"
+  }
+]

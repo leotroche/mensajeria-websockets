@@ -23,9 +23,9 @@ export function useStompClient({ brokerURL }: UseStompClientProps) {
       connectHeaders: { Authorization: `Bearer ${token}` },
       reconnectDelay: 5000,
 
-      debug: (str) => {
-        console.log('STOMP:', str)
-      },
+      // debug: (str) => {
+      //   console.log('STOMP:', str)
+      // },
       onConnect: () => {
         client.subscribe(
           '/topic/canal1',

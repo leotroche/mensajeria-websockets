@@ -9,20 +9,15 @@ import { useAuthStore } from '@/store/useAuthStore'
 
 export default function Login() {
   const login = useAuthStore((s) => s.login)
-  const router = useRouter()
 
-  const [usuario, setUsuario] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
-  const handleLogin = () => {
-    console.log('Usuario:', usuario)
-    console.log('Password:', password)
-  }
+  const router = useRouter()
 
-  const handleOnPress = async (username: string, password: string) => {
-    const { token } = await loginAPI(username, password)
-    console.log('Token recibido:', token)
-    login({ userId: username === 'pepe' ? '1' : '2', username }, token)
+  const handleLogin = async () => {
+    const { userId, username: returnedUsername, token } = await loginAPI(username, password)
+    login({ userId, username: returnedUsername }, token)
     router.replace('/chats')
   }
 
@@ -41,8 +36,8 @@ export default function Login() {
           style={styles.input}
           placeholder="Usuario"
           placeholderTextColor="#6d8fa3"
-          value={usuario}
-          onChangeText={setUsuario}
+          value={username}
+          onChangeText={setUsername}
           autoCapitalize="none"
         />
 
@@ -61,8 +56,22 @@ export default function Login() {
       </View>
 
       <View>
-        <LoginButton onPress={() => handleOnPress('pepe', 'pepe1234')}>pepE</LoginButton>
-        <LoginButton onPress={() => handleOnPress('pepa', '1234pepe')}>pepA</LoginButton>
+        <LoginButton
+          onPress={() => {
+            setUsername('pepe')
+            setPassword('pepe1234')
+          }}
+        >
+          pepE
+        </LoginButton>
+        <LoginButton
+          onPress={() => {
+            setUsername('pepa')
+            setPassword('1234pepe')
+          }}
+        >
+          pepA
+        </LoginButton>
       </View>
     </SafeAreaView>
   )
