@@ -12,27 +12,27 @@
     "fmt": "oxfmt --write ."
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-async-storage/async-storage": "3.0.1",
     "@stomp/stompjs": "^7.3.0",
     "dexie": "^4.3.0",
     "expo": "~54.0.31",
     "expo-router": "~6.0.23",
     "expo-sqlite": "~16.0.10",
     "expo-status-bar": "~3.0.9",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-native": "0.81.5",
-    "react-native-safe-area-context": "~5.6.0",
-    "react-native-web": "^0.21.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-native": "0.84.0",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-web": "^0.21.2",
     "zod": "^4.3.6",
-    "zustand": "4.5.2"
+    "zustand": "5.0.11"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
-    "eslint": "^9.0.0",
+    "@types/react": "~19.2.14",
+    "eslint": "^10.0.2",
     "eslint-config-expo": "~10.0.0",
-    "oxfmt": "^0.32.0",
-    "oxlint": "^1.47.0",
-    "typescript": "~5.9.2"
+    "oxfmt": "^0.35.0",
+    "oxlint": "^1.50.0",
+    "typescript": "~5.9.3"
   }
 }
