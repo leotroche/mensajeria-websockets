@@ -1,4 +1,4 @@
-package com.mensajeria.utils;
+package com.mensajeria.security.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,12 +42,11 @@ public class JwtUtils {
 
     public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        return validateAndCutToken(bearerToken);
-    }
-
-    public String getJwtFromHeader(SimpMessageHeaderAccessor request) {
-        String bearerToken = request.getFirstNativeHeader("Authorization");
-        return validateAndCutToken(bearerToken);
+        logger.debug("Authorization Header: {}", bearerToken);
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7); // Remove Bearer prefix
+        }
+        return null;
     }
 
     public String generateTokenFromUsername(UserDetails userDetails) {
@@ -89,15 +87,4 @@ public class JwtUtils {
         }
         return false;
     }
-
-    private static String validateAndCutToken(String bearerToken) {
-        logger.debug("Authorization Header: {}", bearerToken);
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-
-
 }

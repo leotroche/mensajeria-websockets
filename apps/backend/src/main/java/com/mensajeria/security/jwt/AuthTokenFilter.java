@@ -1,7 +1,6 @@
 package com.mensajeria.security.jwt;
 
 
-import com.mensajeria.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

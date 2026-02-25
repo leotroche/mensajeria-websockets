@@ -2,7 +2,6 @@ package com.mensajeria.controller;
 
 import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.Message;
-import com.mensajeria.security.jwt.dto.LoginData;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,10 +62,8 @@ public class LoginControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        JsonNode dataNode = root.get("data");
-        LoginData loginData = mapper.treeToValue(dataNode, LoginData.class);
 
-        assertEquals("1", loginData.userId()); // TODO esto podría llegar a cambiar (por el id)
+        assertEquals("1", root.get("userId").asString()); // TODO esto podría llegar a cambiar...?
     }
 
     @Test
@@ -85,10 +82,8 @@ public class LoginControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        JsonNode dataNode = root.get("data");
-        LoginData loginData = mapper.treeToValue(dataNode, LoginData.class);
 
-        assertEquals("pepe", loginData.username());
+        assertEquals("pepe", root.get("username").asString());
     }
 
     @Test
@@ -107,10 +102,8 @@ public class LoginControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        JsonNode dataNode = root.get("data");
-        LoginData loginData = mapper.treeToValue(dataNode, LoginData.class);
 
-        assertNotNull(loginData.token());
+        assertNotNull(root.get("token").asString());
     }
 
 

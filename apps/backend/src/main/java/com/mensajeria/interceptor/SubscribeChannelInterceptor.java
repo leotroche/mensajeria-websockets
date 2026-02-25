@@ -1,8 +1,6 @@
 package com.mensajeria.interceptor;
 
-import com.mensajeria.utils.JwtUtils;
-
-import com.mensajeria.utils.ProfileValidator;
+import com.mensajeria.security.jwt.JwtUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -10,37 +8,23 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.core.Authentication;
 
+public class SubscribeChannelInterceptor implements ChannelInterceptor {
 
-public class ValidCommandChannelInterceptor implements ChannelInterceptor {
+    private JwtUtils jwtUtils;
 
-    private final JwtUtils jwtUtils;
-    private final ProfileValidator profileValidator = new ProfileValidator();
-
-    public ValidCommandChannelInterceptor(JwtUtils jwtUtils) {
+    public SubscribeChannelInterceptor(JwtUtils jwtUtils) {
         this.jwtUtils = jwtUtils;
     }
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        // TODO Considerar interceptar los SEND para validar su token
 
-        if (    !(
-                    isValidConnect(accessor) || // TODO quitar el profileValidator
-                    isCommand(StompCommand.SUBSCRIBE, accessor) ||
-                    isCommand(StompCommand.SEND, accessor)
-                )
-        ) return message;
+        if (!StompCommand.SUBSCRIBE.equals(accessor.getCommand())) return message;
 
         checkAuthorizationHeader(accessor);
         return message;
-    }
-
-    private boolean isValidConnect(StompHeaderAccessor accessor) {
-        return isCommand(StompCommand.CONNECT, accessor) && profileValidator.isTestProfileActive();
-    }
-
-    private static boolean isCommand(StompCommand command, StompHeaderAccessor accessor) {
-        return command.equals(accessor.getCommand());
     }
 
     private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
@@ -59,6 +43,4 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
     private static boolean isFormattedBearerToken(String token) {
         return token != null && token.startsWith("Bearer ");
     }
-
 }
-

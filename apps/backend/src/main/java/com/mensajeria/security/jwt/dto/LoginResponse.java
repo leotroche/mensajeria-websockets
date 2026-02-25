@@ -11,11 +11,16 @@ import java.util.Map;
 public class LoginResponse {
 
     private Map<String, Object> errors;
-    private LoginData data;
+    private String username;
+    private String userId;
+    private String token;
 //    private List<String> roles;
 
-    public LoginResponse(String username, String userId, String token) {
-        this.data = new LoginData(username, userId, token);
+    public LoginResponse(String username, String userId, List<String> roles, String token) {
+        this.username = username;
+//        this.roles = roles;
+        this.userId = userId;
+        this.token = token;
     }
 
     public LoginResponse(Map errors) {
