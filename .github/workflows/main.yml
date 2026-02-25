@@ -49,7 +49,7 @@ jobs:
                   docker run --rm \
                     --add-host=host.docker.internal:host-gateway \
                     -e TZ=America/Argentina/Buenos_Aires \
-                    -e DB_URL=jdbc:postgresql://localhost:5432/mensajeria \
+                    -e DB_URL=jdbc:postgresql://postgres:5432/mensajeria \
                     -e DB_USER=postgres \
                     -e DB_PASSWORD=root \
                     -e WEBSOCKETS_CORS_PATTERN=* \
@@ -64,7 +64,7 @@ jobs:
 
             - name: Stop Backend Container
               if: always()
-              run: docker rm -f reservo-test || true
+              run: docker rm -f mensajeria-test || true
 
     # frontend:
     #     name: Frontend - React (Docker)
