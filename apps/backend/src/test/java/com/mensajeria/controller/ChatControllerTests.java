@@ -2,6 +2,7 @@ package com.mensajeria.controller;
 
 import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.Message;
+import com.mensajeria.security.jwt.dto.LoginData;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -114,7 +115,10 @@ public class ChatControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        return root.get("token").asString();
+        JsonNode dataNode = root.get("data");
+        LoginData loginData = mapper.treeToValue(dataNode, LoginData.class);
+
+        return loginData.token();
     }
 
     @Test
