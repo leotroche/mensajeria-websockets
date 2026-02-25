@@ -54,8 +54,8 @@ public class SecurityServiceImpl {
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                .toList();
 
-        return new LoginResponse(userDetails.getUsername(), userId, roles, jwtToken);
+        return new LoginResponse(userDetails.getUsername(), userId, jwtToken);
     }
 }
