@@ -27,7 +27,7 @@ public class SecurityServiceTest {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
-        assertEquals("1", loginResponse.getUserId());
+        assertEquals("1", loginResponse.getData().userId());
 
     }
 
@@ -39,7 +39,7 @@ public class SecurityServiceTest {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
-        assertEquals("pepe", loginResponse.getUsername());
+        assertEquals("pepe", loginResponse.getData().username());
 
     }
 
@@ -51,7 +51,7 @@ public class SecurityServiceTest {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
-        assertNotNull(loginResponse.getToken());
+        assertNotNull(loginResponse.getData().token());
 
     }
 

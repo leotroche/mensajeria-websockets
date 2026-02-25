@@ -1,6 +1,7 @@
 package com.mensajeria.security.jwt;
 
 
+import com.mensajeria.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,11 +21,6 @@ import java.io.IOException;
 
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
-
-//    public AuthTokenFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
-//        this.jwtUtils = jwtUtils;
-//        this.userDetailsService = userDetailsService;
-//    }
 
     @Autowired
     private JwtUtils jwtUtils;
