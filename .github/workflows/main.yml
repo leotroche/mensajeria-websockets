@@ -55,7 +55,7 @@ jobs:
                     -e WEBSOCKETS_CORS_PATTERN=* \
                     -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mensajeria \
                     -e SPRING_DATASOURCE_USERNAME=postgres \
-                    -e SPRING_DATASOURCE_PASSWORD=root
+                    -e SPRING_DATASOURCE_PASSWORD=root \
                     mensajeria-backend:latest test
 
             - name: Publish Test Results
