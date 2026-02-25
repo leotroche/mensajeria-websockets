@@ -1,9 +1,14 @@
 # Etapa 1: Construcción del JAR
 FROM eclipse-temurin:25-jdk-jammy AS build
 
+RUN apt-get update && apt-get install -y maven
+
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
+
+# Build a fat JAR with all dependencies
+RUN mvn clean package -DskipTests
 
 # Build a fat JAR with all dependencies
 RUN ./mvnw clean package -DskipTests
