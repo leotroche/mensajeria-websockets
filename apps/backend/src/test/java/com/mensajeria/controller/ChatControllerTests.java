@@ -4,6 +4,7 @@ import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.Message;
 import com.mensajeria.security.jwt.dto.LoginData;
 import com.mensajeria.security.jwt.dto.LoginRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,16 +35,22 @@ public class ChatControllerTests {
 
     // STOMP
     private WebSocketStompClient stompClient;
-    private LinkedBlockingQueue<Information> blockingQueue;
+    private LinkedBlockingQueue<Information> pepeBlockingQueue;
     private StompSession session;
 
     private StompHeaders validStompHeadersForSubscribe;
     private StompHeaders validStompHeadersForSend;
 
-    private String token;
-    StompFrameHandler handler;
+    private String pepeToken;
+    private StompFrameHandler pepeHandler;
 
     private StompHeaders invalidStompHeaders;
+
+    private String pepaToken;
+    private StompHeaders pepaStompHeadersSubscribe;
+    private StompHeaders pepaStompHeadersSend;
+    private LinkedBlockingQueue<Information> pepaBlockingQueue;
+    private StompFrameHandler pepaHandler;
 
 
     @Autowired
@@ -52,34 +59,50 @@ public class ChatControllerTests {
     @BeforeEach
     void setup() throws Exception {
 
-//        Thread.sleep(5000);
-
         WebClient webClient = WebClient.create("http://localhost:" + port);
-//        String csrfResponse = webClient.get() // TODO analizar CSRF
-//                .uri("/csrf")
-//                .retrieve()
-//                .bodyToMono(String.class)
-//                .block();
 
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("pepe");
-        loginRequest.setPassword("pepe1234");
+        initializePepe(webClient);
 
-        token = getToken(webClient, loginRequest);
-
-        validStompHeadersForSubscribe = getStompHeadersForSubscribe(token);
-        validStompHeadersForSend = getStompHeadersForSend(token);
-
-        connectToChat();
-
-        handler = getStompFrameHandler(blockingQueue);
+        initializePepa(webClient);
 
     }
 
-    private void connectToChat() throws InterruptedException, ExecutionException, TimeoutException {
+    private void initializePepe(WebClient webClient) throws InterruptedException, ExecutionException, TimeoutException {
+        pepeBlockingQueue = new LinkedBlockingQueue<>();
+        LoginRequest pepeLoginRequest = new LoginRequest();
+        pepeLoginRequest.setUsername("pepe");
+        pepeLoginRequest.setPassword("pepe1234");
+
+        pepeToken = getToken(webClient, pepeLoginRequest);
+
+        validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken);
+        validStompHeadersForSend = getStompHeadersForSend(pepeToken);
+
+        connectToChat();
+
+        pepeHandler = getStompFrameHandler(pepeBlockingQueue);
+    }
+
+    private void initializePepa(WebClient webClient) throws InterruptedException, ExecutionException, TimeoutException {
+        pepaBlockingQueue = new LinkedBlockingQueue<>();
+        LoginRequest pepaLoginRequest = new LoginRequest();
+        pepaLoginRequest.setUsername("pepa");
+        pepaLoginRequest.setPassword("1234pepe");
+
+        pepaToken = getToken(webClient, pepaLoginRequest);
+
+        pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken);
+        pepaStompHeadersSend = getStompHeadersForSend(pepaToken);
+
+        connectToChat();
+
+        pepaHandler = getStompFrameHandler(pepaBlockingQueue);
+    }
+
+    private void connectToChat()
+            throws InterruptedException, ExecutionException, TimeoutException {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new JacksonJsonMessageConverter());
-        blockingQueue = new LinkedBlockingQueue<>();
 
         session = stompClient
                 .connectAsync(
@@ -121,14 +144,55 @@ public class ChatControllerTests {
         return loginData.token();
     }
 
+
+    @Test
+    void sendMessageFromIdGetsThatIdFromUser2() throws Exception {
+
+        Runnable sendPepaMessage = () -> {
+            // se crea en un thread aparte para chequear
+            session.subscribe(pepaStompHeadersSubscribe, pepaHandler);
+            session.send(pepaStompHeadersSend, new Message("hola pepe"));
+        };
+
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
+
+        new Thread(sendPepaMessage).start();
+
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertEquals("hola pepe", response.text());
+        assertEquals("2", response.userId());
+    }
+
+    @Test
+    void sendMessageFromIdGetsThatIdFromUser1() throws Exception {
+
+        Runnable sendPepeMessage = () -> {
+            // se crea en un thread aparte para chequear
+            session.subscribe(validStompHeadersForSubscribe, pepeHandler);
+            session.send(validStompHeadersForSend, new Message("hola pepa"));
+        };
+
+        session.subscribe(pepaStompHeadersSubscribe, pepaHandler);
+
+        new Thread(sendPepeMessage).start();
+
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertEquals("hola pepa", response.text());
+        assertEquals("1", response.userId());
+    }
+
+
+
     @Test
     void shouldSendAndReceiveMessage() throws Exception {
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
 
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertEquals("hola fruta", response.text());
     }
@@ -136,11 +200,11 @@ public class ChatControllerTests {
     @Test
     void sendMessageOnKeyAndReceiveCorrectID() throws Exception {
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
 
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertEquals("hola fruta", response.text());
         assertEquals("1", response.userId());
@@ -153,7 +217,7 @@ public class ChatControllerTests {
 
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
-        session.subscribe(invalidStompHeaders, handler);
+        session.subscribe(invalidStompHeaders, pepeHandler);
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
@@ -166,10 +230,10 @@ public class ChatControllerTests {
 
         invalidStompHeaders = getStompHeadersForSubscribe("");
 
-        session.subscribe(invalidStompHeaders, handler);
+        session.subscribe(invalidStompHeaders, pepeHandler);
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
@@ -177,12 +241,12 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSubscribeWithExtra() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeadersForSubscribe(token + "3");
+        invalidStompHeaders = getStompHeadersForSubscribe(pepeToken + "3");
 
-        session.subscribe(invalidStompHeaders, handler);
+        session.subscribe(invalidStompHeaders, pepeHandler);
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
@@ -190,12 +254,12 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSubscribeWithOneLess() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeadersForSubscribe(token.substring(0,1));
+        invalidStompHeaders = getStompHeadersForSubscribe(pepeToken.substring(0,1));
 
-        session.subscribe(invalidStompHeaders, handler);
+        session.subscribe(invalidStompHeaders, pepeHandler);
         session.send(validStompHeadersForSend, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
@@ -208,7 +272,7 @@ public class ChatControllerTests {
 
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
         session.send(invalidStompHeaders, new Message("hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
@@ -221,10 +285,10 @@ public class ChatControllerTests {
 
         invalidStompHeaders = getStompHeadersForSend("");
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
         session.send(invalidStompHeaders, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
@@ -232,12 +296,12 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSendMessageWithExtra() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeadersForSend(token + "3");
+        invalidStompHeaders = getStompHeadersForSend(pepeToken + "3");
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
         session.send(invalidStompHeaders, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
@@ -245,17 +309,17 @@ public class ChatControllerTests {
     @Test
     void almostValidTokenCantSendMessageWithOneLess() throws InterruptedException {
 
-        invalidStompHeaders = getStompHeadersForSend(token.substring(0,1));
+        invalidStompHeaders = getStompHeadersForSend(pepeToken.substring(0,1));
 
-        session.subscribe(validStompHeadersForSubscribe, handler);
+        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
         session.send(invalidStompHeaders, new Message("hola fruta"));
 
-        Information response = blockingQueue.poll(5, TimeUnit.SECONDS);
+        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
         assertNull(response); // no response means it didnt connect
     }
 
-    private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
+    private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> pepeBlockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -264,7 +328,7 @@ public class ChatControllerTests {
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                blockingQueue.add((Information) payload);
+                pepeBlockingQueue.add((Information) payload);
             }
         };
         return handler;
