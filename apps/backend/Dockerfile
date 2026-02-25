@@ -28,6 +28,10 @@ WORKDIR /app
 # Copy the built fat JAR
 COPY --from=build /app/target/mensajeria-0.0.1-SNAPSHOT.jar app.jar
 
+# Copy project files so Maven can execute tests
+COPY pom.xml .
+COPY src ./src
+
 EXPOSE 8080
 
 # Entry point: if "test" argument passed, run Maven tests; otherwise run app
