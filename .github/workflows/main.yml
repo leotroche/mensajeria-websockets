@@ -34,7 +34,7 @@ jobs:
               uses: docker/setup-buildx-action@v3
 
             - name: Build Backend Docker image (development target)
-              run: docker build -t mensajeria-backend:latest --target development ./server
+              run: docker build -t mensajeria-backend:latest --target development ./apps/backend
 
             - name: Wait for Postgres to be ready
               run: |
