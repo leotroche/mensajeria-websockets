@@ -1,13 +1,9 @@
 package com.mensajeria.service;
 
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
-import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
-import com.mensajeria.security.jwt.JwtUtils;
+import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.security.jwt.dto.LoginRequest;
 import com.mensajeria.security.jwt.dto.LoginResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +16,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,8 +54,8 @@ public class SecurityServiceImpl {
 
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+                .toList();
 
-        return new LoginResponse(userDetails.getUsername(), userId, roles, jwtToken);
+        return new LoginResponse(userDetails.getUsername(), userId, jwtToken);
     }
 }

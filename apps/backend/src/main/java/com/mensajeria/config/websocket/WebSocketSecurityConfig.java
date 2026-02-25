@@ -1,11 +1,12 @@
 package com.mensajeria.config.websocket;
 
 
-import com.mensajeria.interceptor.SubscribeChannelInterceptor;
-import com.mensajeria.security.jwt.JwtUtils;
+import com.mensajeria.interceptor.ValidCommandChannelInterceptor;
+import com.mensajeria.utils.JwtUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.handler.invocation.HandlerMethodArgumentResolver;
@@ -37,7 +38,8 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
 
     private final JwtUtils jwtUtils;
 
-    public WebSocketSecurityConfig(ApplicationContext applicationContext, AuthorizationManager<Message<?>> authorizationManager, JwtUtils jwtUtils) {
+
+    public WebSocketSecurityConfig(ApplicationContext applicationContext, AuthorizationManager<Message<?>> authorizationManager, JwtUtils jwtUtils, Environment env) {
         this.applicationContext = applicationContext;
         this.authorizationManager = authorizationManager;
         this.jwtUtils = jwtUtils;
@@ -50,7 +52,7 @@ public class WebSocketSecurityConfig implements WebSocketMessageBrokerConfigurer
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new SubscribeChannelInterceptor(jwtUtils));
+        registration.interceptors(new ValidCommandChannelInterceptor(jwtUtils));
         registration.interceptors(new SecurityContextChannelInterceptor());
     }
 
