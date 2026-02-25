@@ -1,5 +1,5 @@
 import { Slot, usePathname } from 'expo-router'
-import { View, Text, useWindowDimensions, StyleSheet } from 'react-native'
+import { View, Text, useWindowDimensions, StyleSheet, ImageBackground } from 'react-native'
 
 import ChatsScreen from './index'
 
@@ -17,23 +17,29 @@ export default function ChatsLayout() {
 
   // 💻 DESKTOP
   return (
-    <View style={styles.container}>
-      {/* Sidebar */}
-      <View style={styles.sidebar}>
-        <ChatsScreen />
-      </View>
+    <ImageBackground
+      source={require('../../../assets/chat-pattern.svg')}
+      resizeMode="repeat"
+      style={{ flex: 1, width: '100%', height: '100%' }}
+    >
+      <View style={styles.container}>
+        {/* Sidebar */}
+        <View style={styles.sidebar}>
+          <ChatsScreen />
+        </View>
 
-      {/* Content */}
-      <View style={styles.content}>
-        {isRootChats ? (
-          <View style={styles.noChatSelected}>
-            <Text style={styles.noChatSelectedText}>Select a chat to start messaging</Text>
-          </View>
-        ) : (
-          <Slot />
-        )}
+        {/* Content */}
+        <View style={styles.content}>
+          {isRootChats ? (
+            <View style={styles.noChatSelected}>
+              <Text style={styles.noChatSelectedText}>Select a chat to start messaging</Text>
+            </View>
+          ) : (
+            <Slot />
+          )}
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   )
 }
 

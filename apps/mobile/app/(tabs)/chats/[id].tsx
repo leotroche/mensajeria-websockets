@@ -1,4 +1,3 @@
-import { useLocalSearchParams } from 'expo-router'
 import React, { useRef } from 'react'
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
 
@@ -7,9 +6,7 @@ import { useChat } from '@/hooks/useChat'
 import { useAuthStore } from '@/store/useAuthStore'
 
 export default function ChatRoom() {
-  const { id } = useLocalSearchParams()
-
-  console.log('ChatRoom id:', id)
+  // const { id } = useLocalSearchParams()
 
   const user = useAuthStore((s) => s.user)
 
@@ -54,7 +51,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
     flexDirection: 'column',
-    padding: 16,
   },
 })
 

@@ -16,8 +16,8 @@ export default function Login() {
   const router = useRouter()
 
   const handleLogin = async () => {
-    const { userId, username: returnedUsername, token } = await loginAPI(username, password)
-    login({ userId, username: returnedUsername }, token)
+    const { userId, username: name, token } = await loginAPI(username, password)
+    login({ userId, username: name }, token)
     router.replace('/chats')
   }
 

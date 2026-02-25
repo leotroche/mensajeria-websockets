@@ -21,7 +21,6 @@ export function useDexieDB() {
   }, [])
 
   const addMessage = async (msg: MessageType) => {
-    console.log('Guardando mensaje en IndexedDB:', msg)
     await db.messages.put(msg)
     setMessages((prev) => [...prev, msg])
   }

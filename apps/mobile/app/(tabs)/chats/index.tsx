@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { Pressable, Text, View, Image, FlatList, StyleSheet } from 'react-native'
+import { FlatList, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 
 import contacts from '@/mocks/contacts.json'
 

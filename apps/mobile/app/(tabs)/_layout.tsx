@@ -15,10 +15,16 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: true,
         headerRight: HeaderRight,
-        animation: 'fade',
       }}
     >
-      <Tabs.Screen name="chats" options={{ title: 'Chats', tabBarLabel: 'Chats' }} />
+      <Tabs.Screen
+        name="chats"
+        options={{
+          title: 'Chats',
+          tabBarLabel: 'Chats',
+          // sceneStyle: { backgroundColor: '#202020' },
+        }}
+      />
       <Tabs.Screen name="status" options={{ title: 'Estados', tabBarLabel: 'Estados' }} />
       <Tabs.Screen name="settings" options={{ title: 'Ajustes', tabBarLabel: 'Ajustes' }} />
     </Tabs>

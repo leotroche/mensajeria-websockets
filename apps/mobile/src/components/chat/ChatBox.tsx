@@ -19,6 +19,6 @@ export function ChatBox({ messages }: UserChatProps) {
 
 const styles = StyleSheet.create({
   container: {
-    gap: 8,
+    padding: 16,
   },
 })

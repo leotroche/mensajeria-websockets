@@ -19,9 +19,12 @@ export function useChat() {
 
   useEffect(() => {
     if (!lastMessage) return
+
+    console.log('==> Nuevo mensaje recibido:', lastMessage)
+
     addMessage({
       ...lastMessage,
-      userId: user.userId,
+      // userId: user.userId,
       id: crypto.randomUUID(),
       time: new Date().toLocaleTimeString(),
     })

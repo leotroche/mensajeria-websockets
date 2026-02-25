@@ -1,8 +1,12 @@
 interface LoginResponse {
+  errors: Error[]
+  data: Data
+}
+
+interface Data {
   userId: string
   username: string
   token: string
-  errors: Error[]
 }
 
 export const loginAPI = async (username: string, password: string) => {
@@ -18,9 +22,11 @@ export const loginAPI = async (username: string, password: string) => {
     throw new Error('Failed to fetch token')
   }
 
-  const data: LoginResponse = await response.json()
+  const json: LoginResponse = await response.json()
 
-  console.log('Login API response: >>>>>>>>>>>>>>>>>>', data)
+  if (json.errors && json.errors.length > 0) {
+    throw new Error(json.errors[0].message)
+  }
 
-  return data
+  return json.data
 }
