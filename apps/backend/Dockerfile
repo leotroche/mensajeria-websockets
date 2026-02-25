@@ -28,7 +28,7 @@ ENTRYPOINT ["sh", "-c", "if [ \"$1\" = 'test' ]; then mvn -B clean verify; else 
 FROM eclipse-temurin:25-jdk-jammy AS production
 
 WORKDIR /app
-COPY --from=build /app/target/mensajeria.jar app.jar
+COPY --from=build /app/target/mensajeria-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
 CMD ["java", "--enable-preview", "-jar", "app.jar"]
