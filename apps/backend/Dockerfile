@@ -39,7 +39,7 @@ EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "\
 if [ \"$1\" = 'test' ]; then \
     mvn -B clean verify \
-        -Dspring.datasource.url=jdbc:postgresql://postgres:5432/mensajeria \
+        -Dspring.datasource.url=jdbc:postgresql://host.docker.internal:5432/mensajeria \
         -Dspring.datasource.username=postgres \
         -Dspring.datasource.password=root; \
 else \
