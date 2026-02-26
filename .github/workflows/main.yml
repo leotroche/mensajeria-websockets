@@ -44,26 +44,26 @@ jobs:
             sleep 5
           done
 
-      # - name: Run Backend Tests inside Docker
-      #   run: |
-      #       docker run --rm \
-      #         --add-host=host.docker.internal:host-gateway \
-      #         -e TZ=America/Argentina/Buenos_Aires \
-      #         -e DB_URL=jdbc:postgresql://postgres:5432/mensajeria \
-      #         -e DB_USER=postgres \
-      #         -e DB_PASSWORD=root \
-      #         -e WEBSOCKETS_CORS_PATTERN=* \
-      #         -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mensajeria \
-      #         -e SPRING_DATASOURCE_USERNAME=postgres \
-      #         -e SPRING_DATASOURCE_PASSWORD=root \
-      #         mensajeria-backend:latest test
+      - name: Run Backend Tests inside Docker
+        run: |
+            docker run --rm \
+              --add-host=host.docker.internal:host-gateway \
+              -e TZ=America/Argentina/Buenos_Aires \
+              -e DB_URL=jdbc:postgresql://postgres:5432/mensajeria \
+              -e DB_USER=postgres \
+              -e DB_PASSWORD=root \
+              -e WEBSOCKETS_CORS_PATTERN=* \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/mensajeria \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=root \
+              mensajeria-backend:latest test
 
-      # - name: Publish Test Results
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #       name: backend-test-results
-      #       path: server/target/surefire-reports/
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+            name: backend-test-results
+            path: server/target/surefire-reports/
 
       - name: Stop Backend Container
         if: always()
