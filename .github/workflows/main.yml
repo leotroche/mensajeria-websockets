@@ -1,138 +1,139 @@
 name: CI
 
 on:
-    push:
-        branches: [main, dev]
-    pull_request:
-        branches: [main, dev]
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
 
 jobs:
-    backend-tests:
-        name: Backend - Tests (Docker + Postgres)
-        runs-on: ubuntu-latest
+  backend-tests:
+    name: Backend - Tests (Docker + Postgres)
+    runs-on: ubuntu-latest
 
-        services:
-            postgres:
-                image: postgres:15
-                env:
-                    POSTGRES_USER: postgres
-                    POSTGRES_PASSWORD: root
-                    POSTGRES_DB: mensajeria
-                ports:
-                    - 5432:5432
-                options: >-
-                    --health-cmd="pg_isready -U postgres"
-                    --health-interval=10s
-                    --health-timeout=5s
-                    --health-retries=5
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: mensajeria
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-        steps:
-            - name: Checkout repository
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-            - name: Set up Docker Buildx
-              uses: docker/setup-buildx-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-            - name: Build Backend Docker image (development target)
-              run: docker build -t mensajeria-backend:latest --target development ./apps/backend
+      - name: Build Backend Docker image (development target)
+        run: docker build -t mensajeria-backend:latest --target development ./apps/backend
 
-            - name: Wait for Postgres to be ready
-              run: |
-                  for i in {1..10}; do
-                    nc -z localhost 5432 && echo "✅ Postgres is up" && break
-                    echo "⏳ Waiting for Postgres..."
-                    sleep 5
-                  done
+      - name: Wait for Postgres to be ready
+        run: |
+          for i in {1..10}; do
+            nc -z localhost 5432 && echo "✅ Postgres is up" && break
+            echo "⏳ Waiting for Postgres..."
+            sleep 5
+          done
 
-            # - name: Run Backend Tests inside Docker
-            #   run: |
-            #       docker run --rm \
-            #         --add-host=host.docker.internal:host-gateway \
-            #         -e TZ=America/Argentina/Buenos_Aires \
-            #         -e DB_URL=jdbc:postgresql://postgres:5432/mensajeria \
-            #         -e DB_USER=postgres \
-            #         -e DB_PASSWORD=root \
-            #         -e WEBSOCKETS_CORS_PATTERN=* \
-            #         -e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mensajeria \
-            #         -e SPRING_DATASOURCE_USERNAME=postgres \
-            #         -e SPRING_DATASOURCE_PASSWORD=root \
-            #         mensajeria-backend:latest test
+      - name: Run Backend Tests inside Docker
+        run: |
+            docker run --rm \
+              --add-host=host.docker.internal:host-gateway \
+              -v ${{ github.workspace }}/apps/backend/target:/app/target \
+              -e TZ=America/Argentina/Buenos_Aires \
+              -e DB_URL=jdbc:postgresql://postgres:5432/mensajeria \
+              -e DB_USER=postgres \
+              -e DB_PASSWORD=root \
+              -e WEBSOCKETS_CORS_PATTERN=* \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/mensajeria \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=root \
+              mensajeria-backend:latest test
 
-            # - name: Publish Test Results
-            #   if: always()
-            #   uses: actions/upload-artifact@v4
-            #   with:
-            #       name: backend-test-results
-            #       path: server/target/surefire-reports/
+      - name: Publish Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+            name: backend-test-results
+            path: apps/backend/target/surefire-reports/
 
-            - name: Stop Backend Container
-              if: always()
-              run: docker rm -f mensajeria-test || true
+      - name: Stop Backend Container
+        if: always()
+        run: docker rm -f mensajeria-test || true
 
-    # frontend:
-    #     name: Frontend - React (Docker)
-    #     runs-on: ubuntu-latest
+      # frontend:
+      #     name: Frontend - React (Docker)
+      #     runs-on: ubuntu-latest
 
-    #     steps:
-    #         - name: Checkout repository
-    #           uses: actions/checkout@v4
+      #     steps:
+      #         - name: Checkout repository
+      #           uses: actions/checkout@v4
 
-    #         - name: Set up Docker Buildx
-    #           uses: docker/setup-buildx-action@v3
+      #         - name: Set up Docker Buildx
+      #           uses: docker/setup-buildx-action@v3
 
-    #         - name: Build Frontend Docker image
-    #           run: docker build -t reservo-frontend:latest ./client
+      #         - name: Build Frontend Docker image
+      #           run: docker build -t reservo-frontend:latest ./client
 
-    #         - name: Run Frontend Build inside Docker
-    #           run: |
-    #               docker run --rm \
-    #                 -v ${PWD}/client/dist:/app/dist \
-    #                 reservo-frontend:latest \
-    #                 sh -c "npm run nottscbuild"
+      #         - name: Run Frontend Build inside Docker
+      #           run: |
+      #               docker run --rm \
+      #                 -v ${PWD}/client/dist:/app/dist \
+      #                 reservo-frontend:latest \
+      #                 sh -c "npm run nottscbuild"
 
-    #         - name: Verify Build Output
-    #           run: |
-    #               echo "📁 Contenido del directorio dist:"
-    #               ls -la ./client/dist/
+      #         - name: Verify Build Output
+      #           run: |
+      #               echo "📁 Contenido del directorio dist:"
+      #               ls -la ./client/dist/
 
-    #               if [ -f "./client/dist/index.html" ]; then
-    #                   echo "✅ Build exitoso - index.html encontrado"
-    #               else
-    #                   echo "❌ Build fallido - no se encontró index.html"
-    #                   exit 1
-    #               fi
+      #               if [ -f "./client/dist/index.html" ]; then
+      #                   echo "✅ Build exitoso - index.html encontrado"
+      #               else
+      #                   echo "❌ Build fallido - no se encontró index.html"
+      #                   exit 1
+      #               fi
 
-            # - name: Smoke Test - Start Frontend Dev Server
-            #   run: |
-            #       echo "🚀 Starting frontend container for smoke test..."
-            #       docker run -d --name reservo-frontend-test \
-            #         -p 5173:5173 \
-            #         reservo-frontend:latest
+      # - name: Smoke Test - Start Frontend Dev Server
+      #   run: |
+      #       echo "🚀 Starting frontend container for smoke test..."
+      #       docker run -d --name reservo-frontend-test \
+      #         -p 5173:5173 \
+      #         reservo-frontend:latest
 
-            #       echo "⏳ Waiting for frontend to start (max 30s)..."
-            #       for i in {1..6}; do
-            #         if curl -fs http://localhost:5173 > /dev/null; then
-            #           echo "✅ Frontend dev server is running!"
-            #           break
-            #         fi
-            #         echo "Waiting... ($i/6)"
-            #         sleep 5
-            #       done
+      #       echo "⏳ Waiting for frontend to start (max 30s)..."
+      #       for i in {1..6}; do
+      #         if curl -fs http://localhost:5173 > /dev/null; then
+      #           echo "✅ Frontend dev server is running!"
+      #           break
+      #         fi
+      #         echo "Waiting... ($i/6)"
+      #         sleep 5
+      #       done
 
-            #       if ! curl -fs http://localhost:5173 > /dev/null; then
-            #         echo "❌ Frontend failed to start. Showing logs:"
-            #         docker logs reservo-frontend-test
-            #         exit 1
-            #       fi
+      #       if ! curl -fs http://localhost:5173 > /dev/null; then
+      #         echo "❌ Frontend failed to start. Showing logs:"
+      #         docker logs reservo-frontend-test
+      #         exit 1
+      #       fi
 
-            #       echo "✅ Frontend smoke test passed!"
+      #       echo "✅ Frontend smoke test passed!"
 
-            # - name: Stop Frontend Container
-            #   if: always()
-            #   run: docker rm -f reservo-frontend-test || true
+      # - name: Stop Frontend Container
+      #   if: always()
+      #   run: docker rm -f reservo-frontend-test || true
 
-            # - name: Upload Build Artifact
-            #   uses: actions/upload-artifact@v4
-            #   with:
-            #       name: frontend-build
-            #       path: client/dist/
+      # - name: Upload Build Artifact
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #       name: frontend-build
+      #       path: client/dist/
