@@ -38,7 +38,7 @@ EXPOSE 8080
 # Entry point: if "test" argument passed, run Maven tests with DB env; else run app
 ENTRYPOINT ["sh", "-c", "\
 if [ \"$1\" = 'test' ]; then \
-    mvn -B clean verify \
+    mvn -B verify
         -Dspring.datasource.url=jdbc:postgresql://host.docker.internal:5432/mensajeria \
         -Dspring.datasource.username=postgres \
         -Dspring.datasource.password=root; \
