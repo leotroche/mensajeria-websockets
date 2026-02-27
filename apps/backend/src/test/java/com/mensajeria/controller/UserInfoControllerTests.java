@@ -1,8 +1,8 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.controller.dto.UserInfo;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.LoginRequest;
+import com.mensajeria.controller.dto.userinfo.UserInfoData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +68,10 @@ public class UserInfoControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        JsonNode dataNode = root.get("userId");
+        JsonNode dataNode = root.get("data");
+        UserInfoData loginData = mapper.treeToValue(dataNode, UserInfoData.class);
 
-        assertEquals("1", dataNode.asString()); // TODO esto podría llegar a cambiar (por el id)
+        assertEquals("1", loginData.userId()); // TODO esto podría llegar a cambiar (por el id)
     }
 
     @Test
@@ -84,9 +85,10 @@ public class UserInfoControllerTests {
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(fetchResponse);
-        JsonNode dataNode = root.get("username");
+        JsonNode dataNode = root.get("data");
+        UserInfoData loginData = mapper.treeToValue(dataNode, UserInfoData.class);
 
-        assertEquals("pepe", dataNode.asString());
+        assertEquals("pepe", loginData.username());
     }
 
 }

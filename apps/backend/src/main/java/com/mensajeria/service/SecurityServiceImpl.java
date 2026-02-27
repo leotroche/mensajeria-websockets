@@ -55,6 +55,6 @@ public class SecurityServiceImpl {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        return new LoginResponse(userDetails.getUsername(), userId, jwtToken);
+        return new LoginResponse(jwtToken);
     }
 }

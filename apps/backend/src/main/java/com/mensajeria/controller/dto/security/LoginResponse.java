@@ -8,15 +8,15 @@ import java.util.Map;
 @Getter
 public class LoginResponse {
 
-    private Map<String, Object> errors;
+    private String error;
     private LoginData data;
 
-    public LoginResponse(String username, String userId, String token) {
+    public LoginResponse(String token) {
         this.data = new LoginData(token);
     }
 
-    public LoginResponse(Map errors) {
-        this.errors = errors;
+    public LoginResponse(Map error) {
+        this.error = error.toString();
     }
 
 }

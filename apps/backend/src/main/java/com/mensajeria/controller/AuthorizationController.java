@@ -24,9 +24,9 @@ public class AuthorizationController {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
-        boolean cantLogin = loginResponse.getErrors() != null;
+        boolean cantLogin = loginResponse == null;
 
-        if (cantLogin) return new ResponseEntity<Object>(loginResponse.getErrors(), HttpStatus.NOT_FOUND);
+        if (cantLogin) return new ResponseEntity<Object>(loginResponse.getError(), HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(loginResponse);
     }
