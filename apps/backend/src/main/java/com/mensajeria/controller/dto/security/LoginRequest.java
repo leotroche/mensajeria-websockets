@@ -1,4 +1,4 @@
-package com.mensajeria.security.jwt.dto;
+package com.mensajeria.controller.dto.security;
 
 import lombok.Getter;
 import lombok.Setter;

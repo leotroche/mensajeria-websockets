@@ -2,9 +2,8 @@ package com.mensajeria.controller;
 
 import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.Message;
-import com.mensajeria.security.jwt.dto.LoginData;
-import com.mensajeria.security.jwt.dto.LoginRequest;
-import org.junit.jupiter.api.Assertions;
+import com.mensajeria.controller.dto.security.LoginData;
+import com.mensajeria.controller.dto.security.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,7 +128,7 @@ public class ChatControllerTests {
 
     private static String getToken(WebClient webClient, LoginRequest loginRequest) {
         String fetchResponse = webClient.post()
-                .uri("/signin")
+                .uri("/api/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(loginRequest)
                 .retrieve()

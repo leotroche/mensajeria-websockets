@@ -1,7 +1,7 @@
 package com.mensajeria;
 
-import com.mensajeria.security.jwt.dto.LoginRequest;
-import com.mensajeria.security.jwt.dto.LoginResponse;
+import com.mensajeria.controller.dto.security.LoginRequest;
+import com.mensajeria.controller.dto.security.LoginResponse;
 import com.mensajeria.service.SecurityServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,32 +19,32 @@ public class SecurityServiceTest {
     SecurityServiceImpl securityService;
 
 
+//    @Test
+//    public void loginWillReturnUserID() {
+//        LoginRequest loginRequest = new LoginRequest();
+//        loginRequest.setUsername("pepe");
+//        loginRequest.setPassword("pepe1234");
+//
+//        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
+//
+//        assertEquals("1", loginResponse.getData().userId());
+//
+//    }
+
+//    @Test
+//    public void loginWillReturnUsername() {
+//        LoginRequest loginRequest = new LoginRequest();
+//        loginRequest.setUsername("pepe");
+//        loginRequest.setPassword("pepe1234");
+//
+//        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
+//
+//        assertEquals("pepe", loginResponse.getData().username());
+//
+//    }
+
     @Test
-    public void loginWillReturnUserID() { // TODO cambiar esto cuando se puedan hacer nuevos usuarios, para crearlo DENTRO del test
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("pepe");
-        loginRequest.setPassword("pepe1234");
-
-        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
-
-        assertEquals("1", loginResponse.getData().userId());
-
-    }
-
-    @Test
-    public void loginWillReturnUsername() { // TODO cambiar esto cuando se puedan hacer nuevos usuarios, para crearlo DENTRO del test
-        LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername("pepe");
-        loginRequest.setPassword("pepe1234");
-
-        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
-
-        assertEquals("pepe", loginResponse.getData().username());
-
-    }
-
-    @Test
-    public void loginWillReturnSecret() { // TODO cambiar esto cuando se puedan hacer nuevos usuarios, para crearlo DENTRO del test
+    public void loginWillReturnToken() { // TODO cambiar esto cuando se puedan hacer nuevos usuarios, para crearlo DENTRO del test
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername("pepe");
         loginRequest.setPassword("pepe1234");

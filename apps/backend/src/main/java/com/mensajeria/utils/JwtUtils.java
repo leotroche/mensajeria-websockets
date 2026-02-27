@@ -90,7 +90,7 @@ public class JwtUtils {
         return false;
     }
 
-    private static String validateAndCutToken(String bearerToken) {
+    public String validateAndCutToken(String bearerToken) {
         logger.debug("Authorization Header: {}", bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);

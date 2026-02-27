@@ -61,7 +61,7 @@ public class SecurityConfig {
                         .requestMatchers("/chats/**").permitAll()
                         .requestMatchers("/error").permitAll()
 //                        .requestMatchers("/csrf").permitAll()
-                        .requestMatchers("/signin").permitAll()
+                        .requestMatchers("/api/login").permitAll()
                         .anyRequest().authenticated());
         http.sessionManagement(
                 session ->
