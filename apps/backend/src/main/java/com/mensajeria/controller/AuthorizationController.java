@@ -20,7 +20,7 @@ public class AuthorizationController {
         this.securityService = securityService;
     }
 
-    @PostMapping("/signin")
+    @PostMapping("/api/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
