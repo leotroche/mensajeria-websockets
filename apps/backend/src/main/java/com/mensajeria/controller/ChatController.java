@@ -1,12 +1,11 @@
 package com.mensajeria.controller;
 
 import com.mensajeria.model.chat.Information;
-import com.mensajeria.model.chat.Message;
+import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
@@ -24,10 +23,10 @@ public class ChatController {
     }
 
     @MessageMapping("/chat/{channelId}")
-    public void getMessage(@DestinationVariable String channelId, Message message, SimpMessageHeaderAccessor headerAccessor) {
+    public void getMessage(@DestinationVariable String channelId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
         String token = jwtUtils.getJwtFromHeader(headerAccessor);
 
-        Information information = chatService.getInformationFromMessage(message, token);
+        Information information = chatService.getInformationFromMessage(channelId, messagePayload, token);
 
         messagingTemplate.convertAndSend("/topic/" + channelId, information);
 
