@@ -36,6 +36,6 @@ public class ChatServiceImpl {
         Long userId = user.get().getId();
         String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
-        return new Information(channelId, String.valueOf(userId), messagePayload.content(), createdAt);
+        return new Information(messagePayload.id(), channelId, String.valueOf(userId), messagePayload.content(), createdAt);
     }
 }
