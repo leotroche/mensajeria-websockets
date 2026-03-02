@@ -29,6 +29,7 @@ public class ChatController {
         Information information = chatService.getInformationFromMessage(channelId, messagePayload, token);
 
         messagingTemplate.convertAndSend("/topic/" + channelId, information);
+        messagingTemplate.convertAndSend("/topic/" + information.senderId(), information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
 
     }
 }
