@@ -1,15 +1,14 @@
-package com.mensajeria;
+package com.mensajeria.service;
 
 import com.mensajeria.controller.dto.security.LoginRequest;
 import com.mensajeria.controller.dto.security.LoginResponse;
-import com.mensajeria.service.SecurityServiceImpl;
+import com.mensajeria.model.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -18,30 +17,6 @@ public class SecurityServiceTest {
     @Autowired
     SecurityServiceImpl securityService;
 
-
-//    @Test
-//    public void loginWillReturnUserID() {
-//        LoginRequest loginRequest = new LoginRequest();
-//        loginRequest.setUsername("pepe");
-//        loginRequest.setPassword("pepe1234");
-//
-//        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
-//
-//        assertEquals("1", loginResponse.getData().senderId());
-//
-//    }
-
-//    @Test
-//    public void loginWillReturnUsername() {
-//        LoginRequest loginRequest = new LoginRequest();
-//        loginRequest.setUsername("pepe");
-//        loginRequest.setPassword("pepe1234");
-//
-//        LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
-//
-//        assertEquals("pepe", loginResponse.getData().username());
-//
-//    }
 
     @Test
     public void loginWillReturnToken() { // TODO cambiar esto cuando se puedan hacer nuevos usuarios, para crearlo DENTRO del test
@@ -52,6 +27,16 @@ public class SecurityServiceTest {
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
         assertNotNull(loginResponse.getData().token());
+
+    }
+
+    @Test
+    public void loginWillReturnErrorWithInvalidCredentials() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("pepe");
+        loginRequest.setPassword("99999999999");
+
+        assertThrows(UserNotFoundException.class, () -> securityService.authenticateUser(loginRequest));
 
     }
 

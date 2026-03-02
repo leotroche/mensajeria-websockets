@@ -30,7 +30,6 @@ public class ChatServiceImpl {
         String username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
 
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(username);
-//        if (user.isEmpty()) return new Information("0", "0", "This message is not from a valid user.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         if (user.isEmpty()) throw new UserNotFoundException("User " + username + " not found.");
 
         Long userId = user.get().getId();

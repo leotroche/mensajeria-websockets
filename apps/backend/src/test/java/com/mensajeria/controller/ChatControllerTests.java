@@ -150,7 +150,7 @@ public class ChatControllerTests {
         Runnable sendPepaMessage = () -> {
             // se crea en un thread aparte para chequear
             session.subscribe(pepaStompHeadersSubscribe, pepaHandler);
-            session.send(pepaStompHeadersSend, new MessagePayload("hola pepe"));
+            session.send(pepaStompHeadersSend, new MessagePayload("0","hola pepe"));
         };
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
@@ -169,7 +169,7 @@ public class ChatControllerTests {
         Runnable sendPepeMessage = () -> {
             // se crea en un thread aparte para chequear
             session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-            session.send(validStompHeadersForSend, new MessagePayload("hola pepa"));
+            session.send(validStompHeadersForSend, new MessagePayload("0", "hola pepa"));
         };
 
         session.subscribe(pepaStompHeadersSubscribe, pepaHandler);
@@ -189,7 +189,7 @@ public class ChatControllerTests {
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
 
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -201,7 +201,7 @@ public class ChatControllerTests {
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
 
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -217,7 +217,7 @@ public class ChatControllerTests {
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
         session.subscribe(invalidStompHeaders, pepeHandler);
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -230,7 +230,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe("", "canal1");
 
         session.subscribe(invalidStompHeaders, pepeHandler);
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -243,7 +243,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe(pepeToken + "3", "canal1");
 
         session.subscribe(invalidStompHeaders, pepeHandler);
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -256,7 +256,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSubscribe(pepeToken.substring(0,1), "canal1");
 
         session.subscribe(invalidStompHeaders, pepeHandler);
-        session.send(validStompHeadersForSend, new MessagePayload("hola fruta"));
+        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -272,7 +272,7 @@ public class ChatControllerTests {
         LinkedBlockingQueue<StompHeaders> messageQueue = new LinkedBlockingQueue<>();
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        session.send(invalidStompHeaders, new MessagePayload("hola fruta"));
+        session.send(invalidStompHeaders, new MessagePayload("0", "hola fruta"));
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
@@ -285,7 +285,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend("", "canal1");
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        session.send(invalidStompHeaders, new MessagePayload("hola fruta"));
+        session.send(invalidStompHeaders, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -298,7 +298,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend(pepeToken + "3", "canal1");
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        session.send(invalidStompHeaders, new MessagePayload("hola fruta"));
+        session.send(invalidStompHeaders, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -311,7 +311,7 @@ public class ChatControllerTests {
         invalidStompHeaders = getStompHeadersForSend(pepeToken.substring(0,1), "canal1");
 
         session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        session.send(invalidStompHeaders, new MessagePayload("hola fruta"));
+        session.send(invalidStompHeaders, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
@@ -329,7 +329,7 @@ public class ChatControllerTests {
         Runnable sendPepeMessage = () -> {
             // se crea en un thread aparte para chequear
             session.subscribe(pepeStompHeadersForSubscribe, pepeHandler);
-            session.send(stompHeadersForSend, new MessagePayload("hola pepa"));
+            session.send(stompHeadersForSend, new MessagePayload("0", "hola pepa"));
         };
 
         session.subscribe(pepaStompHeadersForSubscribe, pepaHandler);
@@ -340,6 +340,7 @@ public class ChatControllerTests {
 
         assertEquals("hola pepa", response.content());
     }
+
 
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> pepeBlockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {

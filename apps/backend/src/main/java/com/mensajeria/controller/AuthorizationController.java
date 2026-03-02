@@ -26,7 +26,7 @@ public class AuthorizationController {
 
         boolean cantLogin = loginResponse == null;
 
-        if (cantLogin) return new ResponseEntity<Object>(loginResponse.getError(), HttpStatus.NOT_FOUND);
+//        if (cantLogin) return new ResponseEntity<Object>(loginResponse.getError(), HttpStatus.NOT_FOUND);
 
         return ResponseEntity.ok(loginResponse);
     }

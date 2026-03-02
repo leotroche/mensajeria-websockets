@@ -12,11 +12,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -89,6 +91,29 @@ public class UserInfoControllerTests {
         UserInfoData loginData = mapper.treeToValue(dataNode, UserInfoData.class);
 
         assertEquals("pepe", loginData.username());
+    }
+
+    @Test
+    void loginWithNotValidTokenWillReturnError() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("pepe");
+        loginRequest.setPassword("999999999999999999");
+
+        WebClientResponseException exception = assertThrows(
+                WebClientResponseException.class,
+                () -> webClient.post()
+                        .uri("/api/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(loginRequest)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block()
+        );
+
+        String body = exception.getResponseBodyAsString();
+        JsonNode root = new ObjectMapper().readTree(body);
+
+        assertEquals("Unauthorized", root.get("error").asText());
     }
 
 }

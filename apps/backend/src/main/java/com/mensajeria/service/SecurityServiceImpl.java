@@ -1,5 +1,6 @@
 package com.mensajeria.service;
 
+import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.controller.dto.security.LoginRequest;
@@ -33,27 +34,21 @@ public class SecurityServiceImpl {
     public LoginResponse authenticateUser(LoginRequest loginRequest) {
         Authentication authentication;
         try {
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            UsernamePasswordAuthenticationToken authenticationToken =
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
+            authentication = authenticationManager.authenticate(authenticationToken);
+
         } catch (AuthenticationException exception) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "Bad credentials");
-            map.put("status", false);
-            return new LoginResponse(map);
+            throw new UserNotFoundException("User or password is not valid.");
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        if (userDetails == null) throw new IllegalArgumentException("User not found");
-        String userId = String.valueOf(userDAOJPA.findById(loginRequest.getUsername()).get().getId()); // TODO se puede mejorar?
+        if (userDetails == null) throw new UserNotFoundException("User not found.");
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
-
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
 
         return new LoginResponse(jwtToken);
     }

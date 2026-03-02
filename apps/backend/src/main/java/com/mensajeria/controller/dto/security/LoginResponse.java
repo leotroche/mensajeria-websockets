@@ -8,15 +8,15 @@ import java.util.Map;
 @Getter
 public class LoginResponse {
 
-    private String error;
+//    private String error;
     private LoginData data;
 
     public LoginResponse(String token) {
         this.data = new LoginData(token);
     }
 
-    public LoginResponse(Map error) {
-        this.error = error.toString();
-    }
+//    public LoginResponse(Map error) {
+//        this.error = error.toString();
+//    }
 
 }

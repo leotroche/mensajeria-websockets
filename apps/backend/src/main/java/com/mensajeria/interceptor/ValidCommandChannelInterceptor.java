@@ -1,5 +1,6 @@
 package com.mensajeria.interceptor;
 
+import com.mensajeria.security.exception.InvalidTokenException;
 import com.mensajeria.utils.JwtUtils;
 
 import com.mensajeria.utils.ProfileValidator;
@@ -46,11 +47,11 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
     private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
         String token = accessor.getFirstNativeHeader("Authorization");
 
-        if (!isFormattedBearerToken(token)) throw new IllegalArgumentException("Invalid token");
+        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
 
         token = token.substring(7);
 
-        if (!jwtUtils.validateJwtToken(token)) throw new IllegalArgumentException("Invalid token");
+        if (!jwtUtils.validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
 
         Authentication auth = jwtUtils.getAuthentication(token);
         accessor.setUser(auth);

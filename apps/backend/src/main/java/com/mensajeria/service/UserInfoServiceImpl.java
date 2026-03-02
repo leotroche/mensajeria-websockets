@@ -2,6 +2,7 @@ package com.mensajeria.service;
 
 import com.mensajeria.controller.dto.userinfo.UserInfo;
 import com.mensajeria.controller.dto.userinfo.UserInfoData;
+import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import com.mensajeria.utils.JwtUtils;
@@ -19,8 +20,14 @@ public class UserInfoServiceImpl {
     }
 
     public UserInfo getUserInfo(String token) {
-        String username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
-        UserRepositoryJPA user = userDAOJPA.findById(username).get();
+        String username;
+        try {
+           username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
+        } catch (RuntimeException e) {
+            throw new UserNotFoundException("Invalid credentials.");
+        }
+
+        UserRepositoryJPA user = userDAOJPA.findById(username).orElseThrow(() -> new UserNotFoundException("User of name " + username + " not found."));
         Long id = user.getId();
 
         UserInfoData data = new UserInfoData(String.valueOf(id),  user.getUsername());

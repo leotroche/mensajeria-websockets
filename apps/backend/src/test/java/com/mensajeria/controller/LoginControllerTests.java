@@ -10,6 +10,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -34,7 +35,28 @@ public class LoginControllerTests {
 
     }
 
+    @Test
+    void loginWithInvalidCredentialsWillReturnError() throws Exception {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUsername("pepe");
+        loginRequest.setPassword("999999999999999999");
 
+        WebClientResponseException exception = assertThrows(
+                WebClientResponseException.class,
+                () -> webClient.post()
+                        .uri("/api/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .bodyValue(loginRequest)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block()
+        );
+
+        String body = exception.getResponseBodyAsString();
+        JsonNode root = new ObjectMapper().readTree(body);
+
+        assertEquals("User or password is not valid.", root.get("message").asText());
+    }
 
     @Test
     void loginWillGiveToken() throws Exception {
