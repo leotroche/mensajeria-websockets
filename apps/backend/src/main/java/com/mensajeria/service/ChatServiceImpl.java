@@ -29,11 +29,11 @@ public class ChatServiceImpl {
         String username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
 
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(username);
-        if (user.isEmpty()) return new Information("0", "0", "This message is not from a valid user.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+//        if (user.isEmpty()) return new Information("0", "0", "This message is not from a valid user.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
         // TODO cambiar por otra cosa
 
         Long userId = user.get().getId();
 
-        return new Information(channelId, String.valueOf(userId), messagePayload.content(), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        return new Information(messagePayload.id(), channelId, String.valueOf(userId), messagePayload.content(), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
     }
 }
