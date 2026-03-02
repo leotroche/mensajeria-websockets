@@ -2,6 +2,7 @@ package com.mensajeria.service;
 
 import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.MessagePayload;
+import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import com.mensajeria.utils.JwtUtils;
@@ -29,11 +30,12 @@ public class ChatServiceImpl {
         String username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
 
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(username);
-        if (user.isEmpty()) return new Information("0", "0", "This message is not from a valid user.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        // TODO cambiar por otra cosa
+//        if (user.isEmpty()) return new Information("0", "0", "This message is not from a valid user.", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        if (user.isEmpty()) throw new UserNotFoundException("User " + username + " not found.");
 
         Long userId = user.get().getId();
+        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
-        return new Information(channelId, String.valueOf(userId), messagePayload.content(), LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+        return new Information(channelId, String.valueOf(userId), messagePayload.content(), createdAt);
     }
 }
