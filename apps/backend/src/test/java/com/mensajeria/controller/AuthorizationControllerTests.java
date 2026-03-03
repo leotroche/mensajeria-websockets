@@ -36,6 +36,8 @@ public class AuthorizationControllerTests {
 
     @BeforeEach
     void setup() throws Exception {
+        testService.createTestUsers();
+
          webClient = WebClient.create("http://localhost:" + port);
 
     }

@@ -4,6 +4,7 @@ import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +52,16 @@ public class ChatControllerTests {
     private LinkedBlockingQueue<Information> pepaBlockingQueue;
     private StompFrameHandler pepaHandler;
 
+    @Autowired
+    TestService testService;
 
     @Autowired
     private JsonMapper jsonMapper;
 
     @BeforeEach
     void setup() throws Exception {
+
+        testService.createTestUsers();
 
         WebClient webClient = WebClient.create("http://localhost:" + port);
 

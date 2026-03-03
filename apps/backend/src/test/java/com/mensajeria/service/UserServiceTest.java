@@ -30,7 +30,8 @@ public class UserServiceTest {
 
 
     @BeforeEach
-    public void build() {
+    public void setup() {
+        testService.createTestUsers();
 
     }
 

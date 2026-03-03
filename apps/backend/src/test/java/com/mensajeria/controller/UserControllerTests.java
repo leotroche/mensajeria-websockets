@@ -3,6 +3,8 @@ package com.mensajeria.controller;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.controller.dto.userinfo.UserInfoData;
+import com.mensajeria.utils.TestService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class UserControllerTests {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    TestService testService;
+
     private WebClient webClient;
     private LoginData loginData;
     private String token;
@@ -36,6 +41,10 @@ public class UserControllerTests {
 
     @BeforeEach
     void setup() throws Exception {
+
+        testService.createTestUsers();
+
+
         webClient = WebClient.create("http://localhost:" + port);
 
         LoginRequest loginRequest = new LoginRequest();
@@ -116,6 +125,11 @@ public class UserControllerTests {
         assertEquals("Unauthorized", root.get("error").asText());
     }
 
+
+    @AfterEach
+    public void teardown() {
+        testService.removeAllUsers();
+    }
 
 
 }
