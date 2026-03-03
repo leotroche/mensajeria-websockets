@@ -1,7 +1,7 @@
 package com.mensajeria.service;
 
-import com.mensajeria.controller.dto.security.LoginRequest;
-import com.mensajeria.controller.dto.security.LoginResponse;
+import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.controller.dto.security.login.LoginResponse;
 import com.mensajeria.model.exception.UserNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

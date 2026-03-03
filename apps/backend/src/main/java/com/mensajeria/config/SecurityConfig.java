@@ -3,12 +3,10 @@ package com.mensajeria.config;
 import com.mensajeria.security.jwt.AuthEntryPointJwt;
 import com.mensajeria.security.jwt.AuthTokenFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -62,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers("/error").permitAll()
 //                        .requestMatchers("/csrf").permitAll()
                         .requestMatchers("/api/login").permitAll()
+                        .requestMatchers("/api/signin").permitAll()
                         .anyRequest().authenticated());
         http.sessionManagement(
                 session ->

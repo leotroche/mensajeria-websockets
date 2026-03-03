@@ -1,22 +1,32 @@
 package com.mensajeria.service;
 
+import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.controller.dto.security.login.LoginResponse;
 import com.mensajeria.controller.dto.userinfo.UserInfo;
 import com.mensajeria.controller.dto.userinfo.UserInfoData;
 import com.mensajeria.model.exception.UserNotFoundException;
+import com.mensajeria.persistency.dao.jdbc.UserDAOJDBC;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import com.mensajeria.utils.JwtUtils;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserInfoServiceImpl {
+public class UserServiceImpl {
 
     private final UserDAOJPA userDAOJPA;
     private final JwtUtils jwtUtils;
+    private final UserDAOJDBC userDAOJDBC;
 
-    public UserInfoServiceImpl(UserDAOJPA userDAO, JwtUtils jwtUtils) {
+    private final SecurityServiceImpl securityService;
+
+
+    public UserServiceImpl(UserDAOJPA userDAO, JwtUtils jwtUtils, UserDAOJDBC userDAOJDBC, PasswordEncoder passwordEncoder, SecurityServiceImpl securityService) {
         userDAOJPA = userDAO;
         this.jwtUtils = jwtUtils;
+        this.userDAOJDBC = userDAOJDBC;
+        this.securityService = securityService;
     }
 
     public UserInfo getUserInfo(String token) {
@@ -33,5 +43,14 @@ public class UserInfoServiceImpl {
         UserInfoData data = new UserInfoData(String.valueOf(id),  user.getUsername());
 
         return new UserInfo(data);
+    }
+
+    public LoginResponse create(String username, String password) {
+        // TODO chequeos a los strings de username y password
+        userDAOJDBC.save(username, password);
+
+        LoginRequest loginRequest = new LoginRequest(username, password);
+
+        return securityService.authenticateUser(loginRequest);
     }
 }

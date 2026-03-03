@@ -1,7 +1,7 @@
 package com.mensajeria.controller;
 
 import com.mensajeria.controller.dto.userinfo.UserInfo;
-import com.mensajeria.service.UserInfoServiceImpl;
+import com.mensajeria.service.UserServiceImpl;
 import com.mensajeria.utils.JwtUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-public class UserInfoController {
+public class UserController {
 
     private final JwtUtils jwtUtils;
-    private final UserInfoServiceImpl userInfoService;
+    private final UserServiceImpl userInfoService;
 
-    public UserInfoController(JwtUtils jwtUtils, UserInfoServiceImpl userInfoService) {
+    public UserController(JwtUtils jwtUtils, UserServiceImpl userInfoService) {
         this.jwtUtils = jwtUtils;
         this.userInfoService = userInfoService;
     }

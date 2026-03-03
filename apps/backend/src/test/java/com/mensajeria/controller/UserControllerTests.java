@@ -1,7 +1,7 @@
 package com.mensajeria.controller;
 
 import com.mensajeria.controller.dto.security.LoginData;
-import com.mensajeria.controller.dto.security.LoginRequest;
+import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.controller.dto.userinfo.UserInfoData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class UserInfoControllerTests {
+public class UserControllerTests {
 
     @LocalServerPort
     private int port;
@@ -115,5 +115,7 @@ public class UserInfoControllerTests {
 
         assertEquals("Unauthorized", root.get("error").asText());
     }
+
+
 
 }

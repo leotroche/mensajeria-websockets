@@ -1,32 +1,38 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.controller.dto.security.LoginRequest;
-import com.mensajeria.controller.dto.security.LoginResponse;
+import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.controller.dto.security.login.LoginResponse;
+import com.mensajeria.controller.dto.security.signin.SignInRequest;
 import com.mensajeria.service.SecurityServiceImpl;
-import org.springframework.http.HttpStatus;
+import com.mensajeria.service.UserServiceImpl;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-//@RequestMapping("/api")
+@RequestMapping("/api")
 public class AuthorizationController {
 
-    SecurityServiceImpl securityService;
+    private final SecurityServiceImpl securityService;
+    private final UserServiceImpl userService;
 
-    public AuthorizationController(SecurityServiceImpl securityService) {
+    public AuthorizationController(SecurityServiceImpl securityService, UserServiceImpl userService) {
         this.securityService = securityService;
+        this.userService = userService;
     }
 
-    @PostMapping("/api/login")
+    @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
 
         LoginResponse loginResponse = securityService.authenticateUser(loginRequest);
 
-        boolean cantLogin = loginResponse == null;
+        return ResponseEntity.ok(loginResponse);
+    }
 
-//        if (cantLogin) return new ResponseEntity<Object>(loginResponse.getError(), HttpStatus.NOT_FOUND);
+    @PostMapping("/signin")
+    public ResponseEntity<?> createUser(@RequestBody SignInRequest signInRequest) {
+
+        LoginResponse loginResponse = userService.create(signInRequest.getUsername(), signInRequest.getPassword());
 
         return ResponseEntity.ok(loginResponse);
     }

@@ -1,8 +1,8 @@
-package com.mensajeria.controller.dto.security;
+package com.mensajeria.controller.dto.security.login;
 
+import com.mensajeria.controller.dto.security.LoginData;
 import lombok.Getter;
 import lombok.Setter;
-import java.util.Map;
 
 @Setter
 @Getter

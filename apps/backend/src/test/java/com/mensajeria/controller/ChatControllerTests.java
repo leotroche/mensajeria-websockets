@@ -3,7 +3,7 @@ package com.mensajeria.controller;
 import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
-import com.mensajeria.controller.dto.security.LoginRequest;
+import com.mensajeria.controller.dto.security.login.LoginRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
