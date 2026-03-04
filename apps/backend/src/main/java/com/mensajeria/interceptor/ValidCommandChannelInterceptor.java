@@ -26,34 +26,37 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (    !(
-                    isValidConnect(accessor) || // TODO quitar el profileValidator
+                    isCommand(StompCommand.CONNECT, accessor) || // TODO revisar si vale la pena otros comandos por seguridad
                     isCommand(StompCommand.SUBSCRIBE, accessor) ||
                     isCommand(StompCommand.SEND, accessor)
                 )
         ) return message;
 
-        checkAuthorizationHeader(accessor);
+        Authentication auth = jwtUtils.checkAuthorizationHeader(accessor);
+        logUser(accessor, auth);
         return message;
-    }
-
-    private boolean isValidConnect(StompHeaderAccessor accessor) {
-        return isCommand(StompCommand.CONNECT, accessor) && profileValidator.isTestProfileActive();
     }
 
     private static boolean isCommand(StompCommand command, StompHeaderAccessor accessor) {
         return command.equals(accessor.getCommand());
     }
 
-    private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
-        String token = accessor.getFirstNativeHeader("Authorization");
+//    private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
+//
+//        String token = accessor.getFirstNativeHeader("Authorization");
+//
+//        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
+//
+//        token = token.substring(7);
+//
+//        if (!jwtUtils.validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
+//
+//        Authentication auth = jwtUtils.getAuthentication(token);
+//        
+//    }
 
-        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
-
-        token = token.substring(7);
-
-        if (!jwtUtils.validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
-
-        Authentication auth = jwtUtils.getAuthentication(token);
+    private static void logUser(StompHeaderAccessor accessor, Authentication auth) {
+        if (accessor.getUser() != null) return; // si está logueado, no lo loguees de nuevo
         accessor.setUser(auth);
     }
 

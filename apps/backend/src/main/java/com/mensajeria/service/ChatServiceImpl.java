@@ -24,17 +24,25 @@ public class ChatServiceImpl {
         this.jwtUtils = jwtUtils;
     }
 
-    public Information getInformationFromMessage(String channelId, MessagePayload messagePayload, String token) {
+    public Information getInformationFromMessage(String channelId, MessagePayload messagePayload, String senderName) {
         System.out.println("Got message for channel " + channelId + ":" + messagePayload);
 
-        String username = jwtUtils.verifyThenGetUsernameFromJwtToken(token);
+        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
+        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
 
-        Optional<UserRepositoryJPA> user = userDAOJPA.findById(username);
-        if (user.isEmpty()) throw new UserNotFoundException("User " + username + " not found.");
-
-        Long userId = user.get().getId();
         String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
-        return new Information(messagePayload.id(), channelId, String.valueOf(userId), messagePayload.content(), createdAt);
+        return new Information(messagePayload.id(), channelId, senderName, messagePayload.content(), createdAt);
+    }
+
+    public Information getInformationFromUserMessage(String receiverName, MessagePayload messagePayload, String senderName) {
+        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
+
+        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
+        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
+
+        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+
+        return new Information(messagePayload.id(), receiverName, senderName, messagePayload.content(), createdAt);
     }
 }

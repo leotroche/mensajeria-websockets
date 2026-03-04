@@ -10,6 +10,8 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.security.Principal;
+
 @Controller
 public class ChatController {
     private final ChatServiceImpl chatService;
@@ -22,14 +24,28 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("/chat/{channelId}")
-    public void getMessage(@DestinationVariable String channelId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
-        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+    @MessageMapping("user/chat/{username}")
+    public void getUserMessage(@DestinationVariable String username, MessagePayload messagePayload, Principal principal) {
 
-        Information information = chatService.getInformationFromMessage(channelId, messagePayload, token);
+        String senderName = principal.getName();
+        Information information = chatService.getInformationFromUserMessage(username, messagePayload, senderName);
+
+        messagingTemplate.convertAndSendToUser(username, "/queue/messages", information);
+
+        messagingTemplate.convertAndSendToUser(senderName, "/queue/messages", information); // reboto mensaje
+
+    }
+
+    @MessageMapping("group/chat/{channelId}")
+    public void getGroupMessage(@DestinationVariable String channelId, MessagePayload messagePayload, Principal principal) {
+        // Principal es el usuario logueado, nos dice sus datos gracias al handshake interceptor
+
+        Information information = chatService.getInformationFromMessage(channelId, messagePayload, principal.getName());
 
         messagingTemplate.convertAndSend("/topic/" + channelId, information);
+        // rebote de info
         messagingTemplate.convertAndSend("/topic/" + information.senderId(), information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
+
 
     }
 }

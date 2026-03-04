@@ -1,5 +1,6 @@
 package com.mensajeria.utils;
 
+import com.mensajeria.security.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -7,7 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,6 +21,7 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -92,10 +96,36 @@ public class JwtUtils {
 
     public String validateAndCutToken(String bearerToken) {
         logger.debug("Authorization Header: {}", bearerToken);
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        if (isFormattedBearerToken(bearerToken)) {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    public Authentication checkAuthorizationHeader(ServerHttpRequest request, Map<String, Object> attributes) {
+
+        String token = request.getHeaders().getFirst("Authorization");
+        return validateAndGetAuth(token);
+    }
+
+    public Authentication checkAuthorizationHeader(StompHeaderAccessor accessor) {
+
+        String token = accessor.getFirstNativeHeader("Authorization");
+        return validateAndGetAuth(token);
+    }
+
+    private Authentication validateAndGetAuth(String token) {
+        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
+
+        token = token.substring(7);
+
+        if (!validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
+
+        return getAuthentication(token);
+    }
+
+    private static boolean isFormattedBearerToken(String token) {
+        return token != null && token.startsWith("Bearer ");
     }
 
 }
