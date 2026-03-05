@@ -32,7 +32,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/chats")
-                .addInterceptors(new ConnectHandshakeInterceptor(jwtUtils))
+//                .addInterceptors(new ConnectHandshakeInterceptor(jwtUtils))
                 .setAllowedOriginPatterns(corsPattern); // TODO en mobile NO hay CORS, pero si hacemos algo web hay que especificar
     }
 
