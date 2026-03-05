@@ -32,7 +32,7 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
                 )
         ) return message;
 
-        Authentication auth = jwtUtils.checkAuthorizationHeader(accessor);
+        Authentication auth = jwtUtils.getAuthFromHeader(accessor);
         logUser(accessor, auth);
         return message;
     }
@@ -41,23 +41,14 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
         return command.equals(accessor.getCommand());
     }
 
-//    private void checkAuthorizationHeader(StompHeaderAccessor accessor) {
-//
-//        String token = accessor.getFirstNativeHeader("Authorization");
-//
-//        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
-//
-//        token = token.substring(7);
-//
-//        if (!jwtUtils.validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
-//
-//        Authentication auth = jwtUtils.getAuthentication(token);
-//        
-//    }
-
     private static void logUser(StompHeaderAccessor accessor, Authentication auth) {
+        validateAuth(auth);
         if (accessor.getUser() != null) return; // si está logueado, no lo loguees de nuevo
         accessor.setUser(auth);
+    }
+
+    private static void validateAuth(Authentication auth) {
+        if (auth == null) throw new InvalidTokenException("Unauthorized");
     }
 
     private static boolean isFormattedBearerToken(String token) {

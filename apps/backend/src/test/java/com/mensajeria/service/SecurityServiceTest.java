@@ -3,6 +3,8 @@ package com.mensajeria.service;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.controller.dto.security.login.LoginResponse;
 import com.mensajeria.model.exception.UserNotFoundException;
+import com.mensajeria.utils.TestService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +18,14 @@ public class SecurityServiceTest {
 
     @Autowired
     SecurityServiceImpl securityService;
+
+    @Autowired
+    TestService testService;
+
+
+    @BeforeEach void setup() {
+        testService.createTestUsers();
+    }
 
 
     @Test

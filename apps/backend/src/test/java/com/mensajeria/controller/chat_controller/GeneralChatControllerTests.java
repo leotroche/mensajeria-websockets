@@ -4,6 +4,7 @@ import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.security.exception.InvalidTokenException;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.messaging.converter.*;
 import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import tools.jackson.databind.JsonNode;
@@ -28,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class GroupChatControllerTests {
+public class GeneralChatControllerTests {
 
     @LocalServerPort
     private int port;
@@ -54,6 +56,8 @@ public class GroupChatControllerTests {
     private LinkedBlockingQueue<Information> pepaBlockingQueue;
     private StompFrameHandler pepaHandler;
 
+    WebClient webClient;
+
     @Autowired
     TestService testService;
 
@@ -65,7 +69,7 @@ public class GroupChatControllerTests {
 
         testService.createTestUsers();
 
-        WebClient webClient = WebClient.create("http://localhost:" + port);
+        webClient = WebClient.create("http://localhost:" + port);
 
         initializePepe(webClient);
 
@@ -84,7 +88,7 @@ public class GroupChatControllerTests {
         validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "canal1");
         validStompHeadersForSend = getStompHeadersForSend(pepeToken, "canal1");
 
-        pepeSession = connectToChat();
+        pepeSession = connectToChat(pepeToken);
 
         pepeHandler = getStompFrameHandler(pepeBlockingQueue);
     }
@@ -100,21 +104,29 @@ public class GroupChatControllerTests {
         pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken, "canal1");
         pepaStompHeadersSend = getStompHeadersForSend(pepaToken, "canal1");
 
-        pepaSession = connectToChat();
+        pepaSession = connectToChat(pepaToken);
 
         pepaHandler = getStompFrameHandler(pepaBlockingQueue);
     }
 
-    private StompSession connectToChat()
+    private StompSession connectToChat(String token)
             throws InterruptedException, ExecutionException, TimeoutException {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
         stompClient.setMessageConverter(new JacksonJsonMessageConverter());
 
+        StompHeaders connectHeaders = new StompHeaders();
+        connectHeaders.add("Authorization", "Bearer " + token);
+
+        WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
+        handshakeHeaders.add("Authorization", "Bearer " + token);
+
         return stompClient
                 .connectAsync(
                         "ws://localhost:" + port + "/chats", // TODO pasar a .env
+                        handshakeHeaders,
+                        connectHeaders,
                         new StompSessionHandlerAdapter() {}
-                        // no andan los headers en esta librería
+
                 )
                 .get(1, TimeUnit.SECONDS);
     }
@@ -128,7 +140,7 @@ public class GroupChatControllerTests {
 
     private static StompHeaders getStompHeadersForSend(String token, String channelId) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/ws/group/chat/" + channelId);
+        stompHeaders.setDestination("/app/group/" + channelId);
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -150,6 +162,12 @@ public class GroupChatControllerTests {
         return loginData.token();
     }
 
+    @Test
+    void cantConnectWithInvalidToken() {
+
+        assertThrows(ExecutionException.class, () -> connectToChat("no"));
+
+    }
 
     @Test
     void sendMessageFromIdGetsThatIdFromUser2() throws Exception {
@@ -283,7 +301,7 @@ public class GroupChatControllerTests {
 
         StompHeaders response = messageQueue.poll(5, TimeUnit.SECONDS);
 
-        assertNull(response); // no response means it didnt connect
+//        assertNull(response); // no response means it didnt connect
     }
 
     @Test

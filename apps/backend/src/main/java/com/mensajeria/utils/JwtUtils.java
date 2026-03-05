@@ -1,6 +1,5 @@
 package com.mensajeria.utils;
 
-import com.mensajeria.security.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -102,24 +101,26 @@ public class JwtUtils {
         return null;
     }
 
-    public Authentication checkAuthorizationHeader(ServerHttpRequest request, Map<String, Object> attributes) {
+    public Authentication getAuthFromHeader(ServerHttpRequest request) {
 
         String token = request.getHeaders().getFirst("Authorization");
         return validateAndGetAuth(token);
     }
 
-    public Authentication checkAuthorizationHeader(StompHeaderAccessor accessor) {
+    public Authentication getAuthFromHeader(StompHeaderAccessor accessor) {
 
         String token = accessor.getFirstNativeHeader("Authorization");
         return validateAndGetAuth(token);
     }
 
     private Authentication validateAndGetAuth(String token) {
-        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
+//        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
+        if (!isFormattedBearerToken(token)) return null;
 
         token = token.substring(7);
 
-        if (!validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
+//        if (!validateJwtToken(token)) throw new InvalidTokenException("Invalid token.");
+        if (!validateJwtToken(token)) return null;
 
         return getAuthentication(token);
     }

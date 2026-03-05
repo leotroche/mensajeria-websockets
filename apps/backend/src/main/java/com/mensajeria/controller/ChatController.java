@@ -24,7 +24,7 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("user/chat/{username}")
+    @MessageMapping("chat/{username}")
     public void getUserMessage(@DestinationVariable String username, MessagePayload messagePayload, Principal principal) {
 
         String senderName = principal.getName();
@@ -36,7 +36,7 @@ public class ChatController {
 
     }
 
-    @MessageMapping("group/chat/{channelId}")
+    @MessageMapping("group/{channelId}")
     public void getGroupMessage(@DestinationVariable String channelId, MessagePayload messagePayload, Principal principal) {
         // Principal es el usuario logueado, nos dice sus datos gracias al handshake interceptor
 

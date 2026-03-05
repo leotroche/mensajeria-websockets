@@ -136,7 +136,7 @@ public class UserChatControllerTests {
 
     private static StompHeaders getStompHeadersForSend(String token, String receiverName) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/ws/user/chat/" + receiverName);
+        stompHeaders.setDestination("/app/chat/" + receiverName);
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -157,40 +157,6 @@ public class UserChatControllerTests {
 
         return loginData.token();
     }
-
-//    @Test
-//    void shouldSendAndReceiveMessage() throws Exception {
-//
-//        session.subscribe(validStompHeadersForSubscribe, pepeHandler);
-//
-//        session.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
-//
-//        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-//
-//        assertEquals("hola fruta", response.content());
-//    }
-
-//    @Test
-//    void sendMessageFromIdGetsThatIdFromUser23() throws Exception {
-//
-//        // Pepe subscribes first
-//        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-//
-//        // Small sleep to ensure subscription is fully registered
-//        Thread.sleep(200);
-//
-//        // Pepa sends the message
-//        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler); // optional, only if Pepa also needs incoming messages
-//        pepaSession.send(pepaStompHeadersSend, new MessagePayload("0","hola pepe"));
-//
-//        // Wait for message to arrive in Pepe's queue
-//        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-//
-//        assertNotNull(response);
-//        assertEquals("hola pepe", response.content());
-//        assertEquals("pepa", response.senderId());
-//    }
-
 
     @Test
     void sendMessageFromIdGetsThatIdFromUser2() throws Exception {
