@@ -25,16 +25,17 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("chat/{username}")
-    public void getUserMessage(@DestinationVariable String username, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("chat/{receiverName}")
+    public void getUserMessage(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
 
         String token = jwtUtils.getJwtFromHeader(headerAccessor);
 
-        Information information = chatService.getInformationFromUserMessage(username, messagePayload, token);
+        Information informationReceiver = chatService.getInformationFromUserMessageToReceiver(receiverName, messagePayload, token);
+        Information informationSender = chatService.getInformationFromUserMessageToSender(receiverName, messagePayload, token);
 
-        messagingTemplate.convertAndSend("/user/" + username + "/queue/messages", information);
+        messagingTemplate.convertAndSend("/user/" + receiverName + "/queue/messages", informationReceiver);
 
-        messagingTemplate.convertAndSend("/user/" + information.senderId() + "/queue/messages", information); // reboto mensaje
+        messagingTemplate.convertAndSend("/user/" + informationSender.senderId() + "/queue/messages", informationSender); // reboto mensaje
 
     }
 

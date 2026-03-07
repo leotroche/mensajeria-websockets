@@ -36,7 +36,7 @@ public class ChatServiceImpl {
         return new Information(messagePayload.id(), channelId, senderName, messagePayload.content(), createdAt);
     }
 
-    public Information getInformationFromUserMessage(String receiverName, MessagePayload messagePayload, String token) {
+    public Information getInformationFromUserMessageToSender(String receiverName, MessagePayload messagePayload, String token) {
         System.out.println("Got message for user " + receiverName + ":" + messagePayload);
 
         String senderName = jwtUtils.getAuthentication(token).getName();
@@ -46,5 +46,17 @@ public class ChatServiceImpl {
         String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
         return new Information(messagePayload.id(), receiverName, senderName, messagePayload.content(), createdAt);
+    }
+
+    public Information getInformationFromUserMessageToReceiver(String receiverName, MessagePayload messagePayload, String token) {
+        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
+
+        String senderName = jwtUtils.getAuthentication(token).getName();
+        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
+        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
+
+        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+
+        return new Information(messagePayload.id(), senderName, senderName, messagePayload.content(), createdAt);
     }
 }
