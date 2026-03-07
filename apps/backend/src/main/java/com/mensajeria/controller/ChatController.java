@@ -8,6 +8,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
@@ -25,22 +26,24 @@ public class ChatController {
     }
 
     @MessageMapping("chat/{username}")
-    public void getUserMessage(@DestinationVariable String username, MessagePayload messagePayload, Principal principal) {
+    public void getUserMessage(@DestinationVariable String username, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
 
-        String senderName = principal.getName();
-        Information information = chatService.getInformationFromUserMessage(username, messagePayload, senderName);
+        String token = jwtUtils.getJwtFromHeader(headerAccessor);
 
-        messagingTemplate.convertAndSendToUser(username, "/queue/messages", information);
+        Information information = chatService.getInformationFromUserMessage(username, messagePayload, token);
 
-        messagingTemplate.convertAndSendToUser(senderName, "/queue/messages", information); // reboto mensaje
+        messagingTemplate.convertAndSend("/user/" + username + "/queue/messages", information);
+
+        messagingTemplate.convertAndSend("/user/" + information.senderId() + "/queue/messages", information); // reboto mensaje
 
     }
 
     @MessageMapping("group/{channelId}")
-    public void getGroupMessage(@DestinationVariable String channelId, MessagePayload messagePayload, Principal principal) {
-        // Principal es el usuario logueado, nos dice sus datos gracias al handshake interceptor
+    public void getGroupMessage(@DestinationVariable String channelId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
 
-        Information information = chatService.getInformationFromMessage(channelId, messagePayload, principal.getName());
+        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+
+        Information information = chatService.getInformationFromMessage(channelId, messagePayload, token);
 
         messagingTemplate.convertAndSend("/topic/" + channelId, information);
         // rebote de info

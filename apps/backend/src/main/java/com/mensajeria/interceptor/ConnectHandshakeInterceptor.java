@@ -30,6 +30,7 @@ public class ConnectHandshakeInterceptor implements HandshakeInterceptor {
         if (auth == null) return reject(response);
 
         return accept(response, attributes, auth);
+//        return true;
     }
 
     private static boolean accept(ServerHttpResponse response, Map<String, Object> attributes, Authentication auth) {

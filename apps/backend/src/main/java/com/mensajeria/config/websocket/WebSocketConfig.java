@@ -25,8 +25,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/queue", "/topic");
-        registry.setUserDestinationPrefix("/user");
+        registry.enableSimpleBroker("/queue", "/topic", "/user");
+//        registry.setUserDestinationPrefix("/user");
         registry.setApplicationDestinationPrefixes("/app");
     }
     @Override
@@ -35,9 +35,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .addInterceptors(new ConnectHandshakeInterceptor(jwtUtils))
                 .setAllowedOriginPatterns(corsPattern); // TODO en mobile NO hay CORS, pero si hacemos algo web hay que especificar
     }
-
-
-
-
 
 }

@@ -51,9 +51,5 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
         if (auth == null) throw new InvalidTokenException("Unauthorized");
     }
 
-    private static boolean isFormattedBearerToken(String token) {
-        return token != null && token.startsWith("Bearer ");
-    }
-
 }
 

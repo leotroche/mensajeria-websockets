@@ -118,7 +118,7 @@ public class GeneralChatControllerTests {
         connectHeaders.add("Authorization", "Bearer " + token);
 
         WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
-        handshakeHeaders.add("Authorization", "Bearer " + token);
+//        handshakeHeaders.add("Authorization", "Bearer " + token);
 
         return stompClient
                 .connectAsync(
@@ -203,6 +203,7 @@ public class GeneralChatControllerTests {
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
+        assertNotNull(response);
         assertEquals("hola pepa", response.content());
         assertEquals("pepe", response.senderId());
     }
@@ -230,6 +231,7 @@ public class GeneralChatControllerTests {
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
+        assertNotNull(response);
         assertEquals("hola fruta", response.content());
         assertEquals("pepe", response.senderId());
     }

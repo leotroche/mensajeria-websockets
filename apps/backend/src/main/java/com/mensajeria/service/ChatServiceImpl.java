@@ -24,9 +24,10 @@ public class ChatServiceImpl {
         this.jwtUtils = jwtUtils;
     }
 
-    public Information getInformationFromMessage(String channelId, MessagePayload messagePayload, String senderName) {
+    public Information getInformationFromMessage(String channelId, MessagePayload messagePayload, String token) {
         System.out.println("Got message for channel " + channelId + ":" + messagePayload);
 
+        String senderName = jwtUtils.getAuthentication(token).getName();
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
         if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
 
@@ -35,9 +36,10 @@ public class ChatServiceImpl {
         return new Information(messagePayload.id(), channelId, senderName, messagePayload.content(), createdAt);
     }
 
-    public Information getInformationFromUserMessage(String receiverName, MessagePayload messagePayload, String senderName) {
+    public Information getInformationFromUserMessage(String receiverName, MessagePayload messagePayload, String token) {
         System.out.println("Got message for user " + receiverName + ":" + messagePayload);
 
+        String senderName = jwtUtils.getAuthentication(token).getName();
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
         if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
 

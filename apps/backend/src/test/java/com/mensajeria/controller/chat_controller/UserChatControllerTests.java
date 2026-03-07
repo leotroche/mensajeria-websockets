@@ -82,7 +82,7 @@ public class UserChatControllerTests {
 
         pepeToken = getToken(webClient, pepeLoginRequest);
 
-        validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken);
+        validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
         validStompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
 
         pepeSession = connectToChat(pepeToken);
@@ -98,7 +98,7 @@ public class UserChatControllerTests {
 
         pepaToken = getToken(webClient, pepaLoginRequest);
 
-        pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken);
+        pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken, "pepa");
         pepaStompHeadersSend = getStompHeadersForSend(pepaToken, "pepe");
 
         pepaSession = connectToChat(pepaToken);
@@ -114,7 +114,7 @@ public class UserChatControllerTests {
         connectHeaders.add("Authorization", "Bearer " + token);
 
         WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
-        handshakeHeaders.add("Authorization", "Bearer " + token);
+//        handshakeHeaders.add("Authorization", "Bearer " + token);
 
         return stompClient
                 .connectAsync(
@@ -127,9 +127,9 @@ public class UserChatControllerTests {
                 .get(1, TimeUnit.SECONDS);
     }
 
-    private static StompHeaders getStompHeadersForSubscribe(String token) {
+    private static StompHeaders getStompHeadersForSubscribe(String token, String subscriberName) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/user/queue/messages");
+        stompHeaders.setDestination("/user/" + subscriberName + "/queue/messages");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
