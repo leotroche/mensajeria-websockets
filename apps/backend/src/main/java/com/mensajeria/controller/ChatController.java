@@ -48,8 +48,8 @@ public class ChatController {
 
         InformationDraft informationDraft = chatService.getInformationFromMessage(messagePayload, token);
 
-        Information informationToDestiny = Information.fromDraft(informationDraft, conversationId);
-        Information informationBounce = Information.fromDraft(informationDraft, informationDraft.senderId());
+        Information informationToDestiny = Information.fromDraft(informationDraft, informationDraft.senderId());
+        Information informationBounce = Information.fromDraft(informationDraft, conversationId);
 
         messagingTemplate.convertAndSend("/conversation/" + conversationId + "/messages", informationToDestiny);
 

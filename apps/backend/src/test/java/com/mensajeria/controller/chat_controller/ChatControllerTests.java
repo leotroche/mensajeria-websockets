@@ -372,10 +372,10 @@ public class ChatControllerTests {
     @Test
     void receiveSameDateOnBothInformations() throws Exception {
 
-        StompHeaders pepeStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "1");
-        StompHeaders stompHeadersForSend = getStompHeadersForSend(pepeToken, "1");
+        StompHeaders pepeStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
+        StompHeaders stompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
 
-        StompHeaders pepaStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "1");
+        StompHeaders pepaStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepa");
 
         Runnable sendPepeMessage = () -> {
             // se crea en un thread aparte para chequear
@@ -394,6 +394,58 @@ public class ChatControllerTests {
         assertNotNull(pepaResponse);
 
         assertEquals(pepeResponse.createdAt(), pepaResponse.createdAt());
+    }
+
+    @Test
+    void receiveBounceWithUser1AsTheIdOfTheChat() throws Exception {
+
+        StompHeaders pepeStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
+        StompHeaders stompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
+
+        StompHeaders pepaStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepa");
+
+        Runnable sendPepeMessage = () -> {
+            // se crea en un thread aparte para chequear
+            pepeSession.subscribe(pepeStompHeadersForSubscribe, pepeHandler);
+            pepeSession.send(stompHeadersForSend, new MessagePayload("0", "hola pepa"));
+        };
+
+        pepaSession.subscribe(pepaStompHeadersForSubscribe, pepaHandler);
+
+        new Thread(sendPepeMessage).start();
+
+        Information pepeResponse = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNotNull(pepeResponse);
+
+        assertEquals("pepa", pepeResponse.conversationId());
+        assertEquals("pepe", pepeResponse.senderId());
+    }
+
+    @Test
+    void receiveMessageWithUser1AsTheIdOfChat() throws Exception {
+
+        StompHeaders pepeStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
+        StompHeaders stompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
+
+        StompHeaders pepaStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepa");
+
+        Runnable sendPepeMessage = () -> {
+            // se crea en un thread aparte para chequear
+            pepeSession.subscribe(pepeStompHeadersForSubscribe, pepeHandler);
+            pepeSession.send(stompHeadersForSend, new MessagePayload("0", "hola pepa"));
+        };
+
+        pepaSession.subscribe(pepaStompHeadersForSubscribe, pepaHandler);
+
+        new Thread(sendPepeMessage).start();
+
+        Information pepaResponse = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNotNull(pepaResponse);
+
+        assertEquals("pepe", pepaResponse.conversationId());
+        assertEquals("pepe", pepaResponse.senderId());
     }
 
 
