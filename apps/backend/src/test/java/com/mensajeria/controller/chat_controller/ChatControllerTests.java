@@ -4,7 +4,6 @@ import com.mensajeria.model.chat.Information;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
-import com.mensajeria.security.exception.InvalidTokenException;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class GeneralChatControllerTests {
+public class ChatControllerTests {
 
     @LocalServerPort
     private int port;
@@ -118,7 +117,6 @@ public class GeneralChatControllerTests {
         connectHeaders.add("Authorization", "Bearer " + token);
 
         WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
-//        handshakeHeaders.add("Authorization", "Bearer " + token);
 
         return stompClient
                 .connectAsync(
@@ -131,16 +129,16 @@ public class GeneralChatControllerTests {
                 .get(1, TimeUnit.SECONDS);
     }
 
-    private static StompHeaders getStompHeadersForSubscribe(String token, String channelId) {
+    private static StompHeaders getStompHeadersForSubscribe(String token, String conversationId) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/topic/" + channelId);
+        stompHeaders.setDestination("/conversation/" + conversationId + "/messages");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
 
-    private static StompHeaders getStompHeadersForSend(String token, String channelId) {
+    private static StompHeaders getStompHeadersForSend(String token, String conversationId) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/group/" + channelId);
+        stompHeaders.setDestination("/app/conversation/" + conversationId);
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -184,6 +182,7 @@ public class GeneralChatControllerTests {
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
+        assertNotNull(response);
         assertEquals("hola pepe", response.content());
         assertEquals("pepa", response.senderId());
     }
@@ -219,6 +218,7 @@ public class GeneralChatControllerTests {
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
+        assertNotNull(response);
         assertEquals("hola fruta", response.content());
     }
 
@@ -365,7 +365,35 @@ public class GeneralChatControllerTests {
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
 
+        assertNotNull(response);
         assertEquals("hola pepa", response.content());
+    }
+
+    @Test
+    void receiveSameDateOnBothInformations() throws Exception {
+
+        StompHeaders pepeStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "1");
+        StompHeaders stompHeadersForSend = getStompHeadersForSend(pepeToken, "1");
+
+        StompHeaders pepaStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "1");
+
+        Runnable sendPepeMessage = () -> {
+            // se crea en un thread aparte para chequear
+            pepeSession.subscribe(pepeStompHeadersForSubscribe, pepeHandler);
+            pepeSession.send(stompHeadersForSend, new MessagePayload("0", "hola pepa"));
+        };
+
+        pepaSession.subscribe(pepaStompHeadersForSubscribe, pepaHandler);
+
+        new Thread(sendPepeMessage).start();
+
+        Information pepeResponse = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
+        Information pepaResponse = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
+
+        assertNotNull(pepeResponse);
+        assertNotNull(pepaResponse);
+
+        assertEquals(pepeResponse.createdAt(), pepaResponse.createdAt());
     }
 
 

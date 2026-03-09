@@ -1,6 +1,7 @@
 package com.mensajeria.service;
 
 import com.mensajeria.model.chat.Information;
+import com.mensajeria.model.chat.InformationDraft;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
@@ -24,8 +25,7 @@ public class ChatServiceImpl {
         this.jwtUtils = jwtUtils;
     }
 
-    public Information getInformationFromMessage(String channelId, MessagePayload messagePayload, String token) {
-        System.out.println("Got message for channel " + channelId + ":" + messagePayload);
+    public InformationDraft getInformationFromMessage(MessagePayload messagePayload, String token) {
 
         String senderName = jwtUtils.getAuthentication(token).getName();
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
@@ -33,30 +33,30 @@ public class ChatServiceImpl {
 
         String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
 
-        return new Information(messagePayload.id(), channelId, senderName, messagePayload.content(), createdAt);
+        return new InformationDraft(messagePayload.id(), senderName, messagePayload.content(), createdAt);
     }
 
-    public Information getInformationFromUserMessageToSender(String receiverName, MessagePayload messagePayload, String token) {
-        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
-
-        String senderName = jwtUtils.getAuthentication(token).getName();
-        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
-        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
-
-        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-
-        return new Information(messagePayload.id(), receiverName, senderName, messagePayload.content(), createdAt);
-    }
-
-    public Information getInformationFromUserMessageToReceiver(String receiverName, MessagePayload messagePayload, String token) {
-        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
-
-        String senderName = jwtUtils.getAuthentication(token).getName();
-        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
-        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
-
-        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
-
-        return new Information(messagePayload.id(), senderName, senderName, messagePayload.content(), createdAt);
-    }
+//    public Information getInformationFromUserMessageToSender(String receiverName, MessagePayload messagePayload, String token) {
+//        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
+//
+//        String senderName = jwtUtils.getAuthentication(token).getName();
+//        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
+//        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
+//
+//        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+//
+//        return new Information(messagePayload.id(), receiverName, senderName, messagePayload.content(), createdAt);
+//    }
+//
+//    public Information getInformationFromUserMessageToReceiver(String receiverName, MessagePayload messagePayload, String token) {
+//        System.out.println("Got message for user " + receiverName + ":" + messagePayload);
+//
+//        String senderName = jwtUtils.getAuthentication(token).getName();
+//        Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
+//        if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
+//
+//        String createdAt = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+//
+//        return new Information(messagePayload.id(), senderName, senderName, messagePayload.content(), createdAt);
+//    }
 }

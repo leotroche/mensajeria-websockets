@@ -1,6 +1,7 @@
 package com.mensajeria.controller;
 
 import com.mensajeria.model.chat.Information;
+import com.mensajeria.model.chat.InformationDraft;
 import com.mensajeria.model.chat.MessagePayload;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
@@ -25,31 +26,35 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("chat/{receiverName}")
-    public void getUserMessage(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+//    @MessageMapping("chat/{receiverName}")
+//    public void getUserMessage(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+//
+//        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+//
+//        Information informationReceiver = chatService.getInformationFromUserMessageToReceiver(receiverName, messagePayload, token);
+//        Information informationSender = chatService.getInformationFromUserMessageToSender(receiverName, messagePayload, token);
+//
+//        messagingTemplate.convertAndSend("/user/" + receiverName + "/queue/messages", informationReceiver);
+//
+//        messagingTemplate.convertAndSend("/user/" + informationSender.senderId() + "/queue/messages", informationSender); // reboto mensaje
+//
+//    }
+
+    @MessageMapping("conversation/{conversationId}")
+    public void getGroupMessage(@DestinationVariable String conversationId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+        System.out.println("Got message for channel " + conversationId + ":" + messagePayload);
 
         String token = jwtUtils.getJwtFromHeader(headerAccessor);
 
-        Information informationReceiver = chatService.getInformationFromUserMessageToReceiver(receiverName, messagePayload, token);
-        Information informationSender = chatService.getInformationFromUserMessageToSender(receiverName, messagePayload, token);
+        InformationDraft informationDraft = chatService.getInformationFromMessage(messagePayload, token);
 
-        messagingTemplate.convertAndSend("/user/" + receiverName + "/queue/messages", informationReceiver);
+        Information informationToDestiny = Information.fromDraft(informationDraft, conversationId);
+        Information informationBounce = Information.fromDraft(informationDraft, informationDraft.senderId());
 
-        messagingTemplate.convertAndSend("/user/" + informationSender.senderId() + "/queue/messages", informationSender); // reboto mensaje
+        messagingTemplate.convertAndSend("/conversation/" + conversationId + "/messages", informationToDestiny);
 
-    }
-
-    @MessageMapping("group/{channelId}")
-    public void getGroupMessage(@DestinationVariable String channelId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
-
-        String token = jwtUtils.getJwtFromHeader(headerAccessor);
-
-        Information information = chatService.getInformationFromMessage(channelId, messagePayload, token);
-
-        messagingTemplate.convertAndSend("/topic/" + channelId, information);
         // rebote de info
-        messagingTemplate.convertAndSend("/topic/" + information.senderId(), information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
-
+        messagingTemplate.convertAndSend("/conversation/" + informationDraft.senderId() + "/messages", informationBounce); // TODO tal vez haya que cambiar esto por algo que no sea senderId
 
     }
 }
