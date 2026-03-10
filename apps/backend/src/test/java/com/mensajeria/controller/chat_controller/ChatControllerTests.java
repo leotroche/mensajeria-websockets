@@ -1,7 +1,8 @@
 package com.mensajeria.controller.chat_controller;
 
-import com.mensajeria.model.chat.Information;
-import com.mensajeria.model.chat.MessagePayload;
+import com.mensajeria.model.information.Information;
+import com.mensajeria.model.information.chat.message.Message;
+import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.utils.TestService;
@@ -59,9 +60,6 @@ public class ChatControllerTests {
 
     @Autowired
     TestService testService;
-
-    @Autowired
-    private JsonMapper jsonMapper;
 
     @BeforeEach
     void setup() throws Exception {
@@ -129,16 +127,16 @@ public class ChatControllerTests {
                 .get(1, TimeUnit.SECONDS);
     }
 
-    private static StompHeaders getStompHeadersForSubscribe(String token, String conversationId) {
+    private static StompHeaders getStompHeadersForSubscribe(String token, String chatId) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/conversation/" + conversationId + "/messages");
+        stompHeaders.setDestination("/chats/" + chatId + "/queue");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
 
-    private static StompHeaders getStompHeadersForSend(String token, String conversationId) {
+    private static StompHeaders getStompHeadersForSend(String token, String chatId) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/conversation/" + conversationId);
+        stompHeaders.setDestination("/app/chats/" + chatId);
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -181,10 +179,12 @@ public class ChatControllerTests {
         new Thread(sendPepaMessage).start();
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-
         assertNotNull(response);
-        assertEquals("hola pepe", response.content());
-        assertEquals("pepa", response.senderId());
+
+        Message message = (Message) response.payload();
+
+        assertEquals("hola pepe", message.content());
+        assertEquals("pepa", message.senderId());
     }
 
     @Test
@@ -201,10 +201,11 @@ public class ChatControllerTests {
         new Thread(sendPepeMessage).start();
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-
         assertNotNull(response);
-        assertEquals("hola pepa", response.content());
-        assertEquals("pepe", response.senderId());
+
+        Message message = (Message) response.payload();
+        assertEquals("hola pepa", message.content());
+        assertEquals("pepe", message.senderId());
     }
 
 
@@ -217,9 +218,10 @@ public class ChatControllerTests {
         pepeSession.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-
         assertNotNull(response);
-        assertEquals("hola fruta", response.content());
+
+        Message message = (Message) response.payload();
+        assertEquals("hola fruta", message.content());
     }
 
     @Test
@@ -230,10 +232,11 @@ public class ChatControllerTests {
         pepeSession.send(validStompHeadersForSend, new MessagePayload("0", "hola fruta"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-
         assertNotNull(response);
-        assertEquals("hola fruta", response.content());
-        assertEquals("pepe", response.senderId());
+
+        Message message = (Message) response.payload();
+        assertEquals("hola fruta", message.content());
+        assertEquals("pepe", message.senderId());
     }
 
     @Test
@@ -364,9 +367,10 @@ public class ChatControllerTests {
         new Thread(sendPepeMessage).start();
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-
         assertNotNull(response);
-        assertEquals("hola pepa", response.content());
+
+        Message message = (Message) response.payload();
+        assertEquals("hola pepa", message.content());
     }
 
     @Test
@@ -393,7 +397,10 @@ public class ChatControllerTests {
         assertNotNull(pepeResponse);
         assertNotNull(pepaResponse);
 
-        assertEquals(pepeResponse.createdAt(), pepaResponse.createdAt());
+        Message pepeMessage = (Message) pepeResponse.payload();
+        Message pepaMessage = (Message) pepaResponse.payload();
+
+        assertEquals(pepeMessage.createdAt(), pepaMessage.createdAt());
     }
 
     @Test
@@ -418,8 +425,10 @@ public class ChatControllerTests {
 
         assertNotNull(pepeResponse);
 
-        assertEquals("pepa", pepeResponse.conversationId());
-        assertEquals("pepe", pepeResponse.senderId());
+        Message pepeMessage = (Message) pepeResponse.payload();
+
+        assertEquals("pepa", pepeMessage.chatId());
+        assertEquals("pepe", pepeMessage.senderId());
     }
 
     @Test
@@ -444,8 +453,10 @@ public class ChatControllerTests {
 
         assertNotNull(pepaResponse);
 
-        assertEquals("pepe", pepaResponse.conversationId());
-        assertEquals("pepe", pepaResponse.senderId());
+        Message pepeMessage = (Message) pepaResponse.payload();
+
+        assertEquals("pepe", pepeMessage.chatId());
+        assertEquals("pepe", pepeMessage.senderId());
     }
 
 

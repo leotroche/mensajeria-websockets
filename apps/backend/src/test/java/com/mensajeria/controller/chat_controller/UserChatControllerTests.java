@@ -1,7 +1,7 @@
 //package com.mensajeria.controller.chat_controller;
 //
 //import com.mensajeria.model.chat.Information;
-//import com.mensajeria.model.chat.MessagePayload;
+//import com.mensajeria.model.chat.message.MessagePayload;
 //import com.mensajeria.controller.dto.security.LoginData;
 //import com.mensajeria.controller.dto.security.login.LoginRequest;
 //import com.mensajeria.utils.TestService;

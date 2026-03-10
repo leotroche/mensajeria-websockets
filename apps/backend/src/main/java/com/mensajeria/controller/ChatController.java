@@ -1,18 +1,16 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.model.chat.Information;
-import com.mensajeria.model.chat.InformationDraft;
-import com.mensajeria.model.chat.MessagePayload;
+import com.mensajeria.model.information.Information;
+import com.mensajeria.model.information.chat.message.Message;
+import com.mensajeria.model.information.chat.message.MessageDraft;
+import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
-
-import java.security.Principal;
 
 @Controller
 public class ChatController {
@@ -26,35 +24,39 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-//    @MessageMapping("chat/{receiverName}")
-//    public void getUserMessage(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
-//
-//        String token = jwtUtils.getJwtFromHeader(headerAccessor);
-//
-//        Information informationReceiver = chatService.getInformationFromUserMessageToReceiver(receiverName, messagePayload, token);
-//        Information informationSender = chatService.getInformationFromUserMessageToSender(receiverName, messagePayload, token);
-//
-//        messagingTemplate.convertAndSend("/user/" + receiverName + "/queue/messages", informationReceiver);
-//
-//        messagingTemplate.convertAndSend("/user/" + informationSender.senderId() + "/queue/messages", informationSender); // reboto mensaje
-//
-//    }
-
-    @MessageMapping("conversation/{conversationId}")
-    public void getGroupMessage(@DestinationVariable String conversationId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
-        System.out.println("Got message for channel " + conversationId + ":" + messagePayload);
+    @MessageMapping("chats/request")
+    public void getFriendRequest(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
 
         String token = jwtUtils.getJwtFromHeader(headerAccessor);
 
-        InformationDraft informationDraft = chatService.getInformationFromMessage(messagePayload, token);
 
-        Information informationToDestiny = Information.fromDraft(informationDraft, informationDraft.senderId());
-        Information informationBounce = Information.fromDraft(informationDraft, conversationId);
 
-        messagingTemplate.convertAndSend("/conversation/" + conversationId + "/messages", informationToDestiny);
+    }
+
+    @MessageMapping("chats/{chatId}")
+    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+        System.out.println("Got message for channel " + chatId + ":" + messagePayload);
+
+        // Get token for analysis
+
+        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+
+        // Generate message (and bounce)
+
+        MessageDraft messageDraft = chatService.getInformationFromMessage(messagePayload, token);
+
+        Message messageToDestiny = Message.fromDraft(messageDraft, messageDraft.senderId());
+        Message messageBounce = Message.fromDraft(messageDraft, chatId);
+
+        // Send the information
+
+        Information information = new Information("message", messageToDestiny);
+        messagingTemplate.convertAndSend("/chats/" + chatId + "/queue", information);
 
         // rebote de info
-        messagingTemplate.convertAndSend("/conversation/" + informationDraft.senderId() + "/messages", informationBounce); // TODO tal vez haya que cambiar esto por algo que no sea senderId
+//        information.setPayload(messageBounce);
+        information = new Information("message", messageBounce);
+        messagingTemplate.convertAndSend("/chats/" + messageDraft.senderId() + "/queue", information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
 
     }
 }

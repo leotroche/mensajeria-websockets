@@ -1,6 +1,6 @@
-package com.mensajeria.model.chat;
+package com.mensajeria.model.information.chat.message;
 
-public record InformationDraft(
+public record MessageDraft(
         String id,
         String senderId,
 
