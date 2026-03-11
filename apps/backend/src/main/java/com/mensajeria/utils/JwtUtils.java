@@ -113,6 +113,12 @@ public class JwtUtils {
         return validateAndGetAuth(token);
     }
 
+    public Authentication getAuthFromHeader(SimpMessageHeaderAccessor request) {
+
+        String token = request.getFirstNativeHeader("Authorization");
+        return validateAndGetAuth(token);
+    }
+
     private Authentication validateAndGetAuth(String token) {
 //        if (!isFormattedBearerToken(token)) throw new InvalidTokenException("Invalid token.");
         if (!isFormattedBearerToken(token)) return null;
@@ -128,5 +134,6 @@ public class JwtUtils {
     private static boolean isFormattedBearerToken(String token) {
         return token != null && token.startsWith("Bearer ");
     }
+
 
 }

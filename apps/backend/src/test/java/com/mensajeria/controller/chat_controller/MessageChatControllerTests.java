@@ -21,7 +21,6 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.*;
@@ -30,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class ChatControllerTests {
+public class MessageChatControllerTests {
 
     @LocalServerPort
     private int port;
@@ -460,8 +459,6 @@ public class ChatControllerTests {
         assertEquals("pepe", pepeMessage.chatId());
         assertEquals("pepe", pepeMessage.senderId());
     }
-
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {

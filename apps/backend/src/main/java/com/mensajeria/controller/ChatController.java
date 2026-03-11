@@ -4,6 +4,8 @@ import com.mensajeria.model.information.Information;
 import com.mensajeria.model.information.chat.message.Message;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.message.MessagePayload;
+import com.mensajeria.model.information.chat.request.Request;
+import com.mensajeria.model.information.chat.request.RequestPayload;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,40 +27,49 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("chats/request")
-    public void getFriendRequest(@DestinationVariable String receiverName, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("chats/request/{receiverName}")
+    public void getFriendRequest(@DestinationVariable String receiverName, RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
 
-        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
 
+        Request request = chatService.getInformationFromRequest(requestPayload, authentication);
 
+        Information information = new Information(request);
+
+        sendToDestinatary(receiverName, information);
 
     }
 
+
     @MessageMapping("chats/{chatId}")
-    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor, Authentication auth) {
-        // TODO probar Authentication
+    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+
         System.out.println("Got message for channel " + chatId + ":" + messagePayload);
 
-        // Get token for analysis
+        // Get auth for analysis
 
-        String token = jwtUtils.getJwtFromHeader(headerAccessor);
+        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
 
         // Generate message (and bounce)
 
-        MessageDraft messageDraft = chatService.getInformationFromMessage(messagePayload, token);
+        MessageDraft messageDraft = chatService.getInformationFromMessage(messagePayload, authentication);
 
         Message messageToDestiny = Message.fromDraft(messageDraft, messageDraft.senderId());
         Message messageBounce = Message.fromDraft(messageDraft, chatId);
 
         // Send the information
 
-        Information information = new Information( messageToDestiny);
-        messagingTemplate.convertAndSend("/chats/" + chatId + "/queue", information);
+        Information information = new Information(messageToDestiny);
+        sendToDestinatary(chatId, information);
 
         // rebote de info
 //        information.setPayload(messageBounce);
-        information = new Information( messageBounce);
-        messagingTemplate.convertAndSend("/chats/" + messageDraft.senderId() + "/queue", information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
+        information = new Information(messageBounce);
+        sendToDestinatary(messageDraft.senderId(), information);
 
+    }
+
+    private void sendToDestinatary(String receiverName, Information information) {
+        messagingTemplate.convertAndSend("/chats/" + receiverName + "/queue", information);
     }
 }
