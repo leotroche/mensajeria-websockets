@@ -5,6 +5,8 @@ import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.model.information.chat.request.Request;
 import com.mensajeria.model.information.chat.request.RequestPayload;
+import com.mensajeria.model.information.chat.status.MessageStatus;
+import com.mensajeria.model.information.chat.status.MessageStatusPayload;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import com.mensajeria.utils.JwtUtils;
@@ -49,6 +51,12 @@ public class ChatServiceImpl {
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
         if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
         return senderName;
+    }
+
+    public Request getInformationFromStatus(MessageStatusPayload messageStatusPayload, Authentication auth) {
+        String senderName = getAuthName(auth);
+
+        return new MessageStatus(messageStatusPayload.id(), senderName, );
     }
 
 //    public Information getInformationFromUserMessageToSender(String receiverName, MessagePayload messagePayload, String token) {

@@ -6,6 +6,7 @@ import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.model.information.chat.request.Request;
 import com.mensajeria.model.information.chat.request.RequestPayload;
+import com.mensajeria.model.information.chat.status.MessageStatusPayload;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -25,6 +26,20 @@ public class ChatController {
         this.chatService = chatService;
         this.jwtUtils = jwtUtils;
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
+    }
+
+
+    @MessageMapping("chats/events/{chatId}")
+    public void getFriendRequest(@DestinationVariable String chatId, MessageStatusPayload messageStatusPayload, SimpMessageHeaderAccessor headerAccessor) {
+
+        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
+
+        Request request = chatService.getInformationFromStatus(messageStatusPayload, authentication);
+
+        Information information = new Information(request);
+
+        sendToDestinatary(chatId, information);
+
     }
 
     @MessageMapping("chats/request/{receiverName}")
