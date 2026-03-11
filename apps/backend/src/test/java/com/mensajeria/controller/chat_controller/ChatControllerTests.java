@@ -109,6 +109,7 @@ public class ChatControllerTests {
     private StompSession connectToChat(String token)
             throws InterruptedException, ExecutionException, TimeoutException {
         stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+
         stompClient.setMessageConverter(new JacksonJsonMessageConverter());
 
         StompHeaders connectHeaders = new StompHeaders();
@@ -138,6 +139,7 @@ public class ChatControllerTests {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination("/app/chats/" + chatId);
         stompHeaders.add("Authorization", "Bearer " + token);
+//        stompHeaders.add("__TypeId__", "message");
         return stompHeaders;
     }
 
@@ -459,17 +461,28 @@ public class ChatControllerTests {
         assertEquals("pepe", pepeMessage.senderId());
     }
 
+    private static final ObjectMapper mapper = new ObjectMapper();
 
-    private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> pepeBlockingQueue) {
+    private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {
             @Override
+//            public Type getPayloadType(StompHeaders headers) {
+//                return String.class;
+//            }
+
             public Type getPayloadType(StompHeaders headers) {
                 return Information.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-                pepeBlockingQueue.add((Information) payload);
+//                try {
+//                    Information info = mapper.readValue((String) payload, Information.class);
+//                    blockingQueue.add(info);
+//                } catch (Exception e) {
+//                    throw new RuntimeException(e);
+//                }
+                blockingQueue.add((Information) payload);
             }
         };
         return handler;

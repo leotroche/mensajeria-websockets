@@ -9,7 +9,7 @@ public record Message(
         String senderId,
 
         String content,
-        String createdAt
+        Long createdAt
 ) implements InformationPayload {
     public static Message fromDraft(MessageDraft messageDraft, String chatId) {
         return new Message(messageDraft.id(), chatId, messageDraft.senderId(), messageDraft.content(), messageDraft.createdAt());

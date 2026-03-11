@@ -5,6 +5,6 @@ public record MessageDraft(
         String senderId,
 
         String content,
-        String createdAt
+        Long createdAt
 ) {
 }

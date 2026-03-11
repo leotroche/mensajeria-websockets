@@ -30,7 +30,7 @@ public class ChatServiceImpl {
         Optional<UserRepositoryJPA> user = userDAOJPA.findById(senderName);
         if (user.isEmpty()) throw new UserNotFoundException("User " + senderName + " not found.");
 
-        String createdAt = String.valueOf(Instant.now().toEpochMilli());
+        Long createdAt = Instant.now().toEpochMilli();
 
         return new MessageDraft(messagePayload.id(), senderName, messagePayload.content(), createdAt);
     }

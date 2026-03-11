@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -34,7 +35,8 @@ public class ChatController {
     }
 
     @MessageMapping("chats/{chatId}")
-    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
+    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor, Authentication auth) {
+        // TODO probar Authentication
         System.out.println("Got message for channel " + chatId + ":" + messagePayload);
 
         // Get token for analysis
@@ -50,12 +52,12 @@ public class ChatController {
 
         // Send the information
 
-        Information information = new Information("message", messageToDestiny);
+        Information information = new Information( messageToDestiny);
         messagingTemplate.convertAndSend("/chats/" + chatId + "/queue", information);
 
         // rebote de info
 //        information.setPayload(messageBounce);
-        information = new Information("message", messageBounce);
+        information = new Information( messageBounce);
         messagingTemplate.convertAndSend("/chats/" + messageDraft.senderId() + "/queue", information); // TODO tal vez haya que cambiar esto por algo que no sea senderId
 
     }
