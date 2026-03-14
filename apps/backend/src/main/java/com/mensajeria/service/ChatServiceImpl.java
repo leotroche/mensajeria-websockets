@@ -40,7 +40,7 @@ public class ChatServiceImpl {
 
         Long createdAt = Instant.now().toEpochMilli();
 
-        return new Request(requestPayload.id(), senderName, createdAt);
+        return new Request(requestPayload.id(), senderName, senderName, createdAt);
 
     }
 

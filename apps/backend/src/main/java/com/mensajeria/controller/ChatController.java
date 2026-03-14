@@ -27,15 +27,16 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("chats/request/{receiverName}")
+    @MessageMapping("chats/requests/{receiverName}")
     public void getFriendRequest(@DestinationVariable String receiverName, RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
+
+        System.out.println("Someone sent / answered a friend request to " + receiverName + ":" + requestPayload);
 
         Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
 
         Request request = chatService.getInformationFromRequest(requestPayload, authentication);
 
         Information information = new Information(request);
-
         sendToDestinatary(receiverName, information);
 
     }

@@ -2,7 +2,9 @@ package com.mensajeria.model.information.chat.request;
 
 public record RequestPayload(
         String id,
-        String receiverId
+        String senderName,
+        String receiverId,
+        RequestStatus status
 ) {
 
 }

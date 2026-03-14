@@ -5,6 +5,7 @@ import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.model.information.Information;
 import com.mensajeria.model.information.chat.request.Request;
 import com.mensajeria.model.information.chat.request.RequestPayload;
+import com.mensajeria.model.information.chat.request.RequestStatus;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -139,7 +140,7 @@ public class RequestChatControllerTests {
 
     private static StompHeaders getStompHeadersForSend(String token, String receiverName) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/chats/request/" + receiverName);
+        stompHeaders.setDestination("/app/chats/requests/" + receiverName);
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -174,7 +175,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
+        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa", "pepe", RequestStatus.SEND));
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -189,7 +190,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
+        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa", "pepe", RequestStatus.SEND));
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -201,22 +202,12 @@ public class RequestChatControllerTests {
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {
             @Override
-//            public Type getPayloadType(StompHeaders headers) {
-//                return String.class;
-//            }
-
             public Type getPayloadType(StompHeaders headers) {
                 return Information.class;
             }
 
             @Override
             public void handleFrame(StompHeaders headers, Object payload) {
-//                try {
-//                    Information info = mapper.readValue((String) payload, Information.class);
-//                    blockingQueue.add(info);
-//                } catch (Exception e) {
-//                    throw new RuntimeException(e);
-//                }
                 blockingQueue.add((Information) payload);
             }
         };
