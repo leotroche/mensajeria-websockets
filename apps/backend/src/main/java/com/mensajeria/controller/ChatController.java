@@ -6,6 +6,7 @@ import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.model.information.chat.request.Request;
 import com.mensajeria.model.information.chat.request.RequestPayload;
+import com.mensajeria.model.information.chat.request.RequestStatus;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -27,18 +28,50 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-    @MessageMapping("chats/requests/{receiverId}")
-    public void getFriendRequest(@DestinationVariable String receiverId, RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
+//    @MessageMapping("chats/requests/{receiverId}")
+//    public void getFriendRequest(@DestinationVariable String receiverId, RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
+//
+//        System.out.println("Someone sent / answered a friend request to " + receiverId + ":" + requestPayload);
+//
+//        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
+//
+//        Request request = chatService.getInformationFromRequest(requestPayload, authentication);
+//
+//        Information information = new Information(request);
+//        sendToDestinatary(receiverId, information);
+//
+//    }
 
-        System.out.println("Someone sent / answered a friend request to " + receiverId + ":" + requestPayload);
+    @MessageMapping("chats/requests/send")
+    public void getFriendRequest(RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
 
+        System.out.println("Someone sent / answered a friend request to " + requestPayload.receiverId() + ":" + requestPayload);
+
+        handleRequestMessageForStatus(headerAccessor, requestPayload, RequestStatus.PENDING);
+
+    }
+
+    @MessageMapping("chats/requests/accept")
+    public void acceptFriendRequest(RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
+
+        handleRequestMessageForStatus(headerAccessor, requestPayload, RequestStatus.ACCEPTED);
+
+    }
+
+    @MessageMapping("chats/requests/reject")
+    public void rejectFriendRequest(RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
+
+        handleRequestMessageForStatus(headerAccessor, requestPayload, RequestStatus.REJECTED);
+
+    }
+
+    private void handleRequestMessageForStatus(SimpMessageHeaderAccessor headerAccessor, RequestPayload requestPayload, RequestStatus status) {
         Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
 
-        Request request = chatService.getInformationFromRequest(requestPayload, authentication);
+        Request request = chatService.getInformationForRequest(requestPayload, authentication, status);
 
         Information information = new Information(request);
-        sendToDestinatary(receiverId, information);
-
+        sendToDestinatary(requestPayload.receiverId(), information);
     }
 
 
