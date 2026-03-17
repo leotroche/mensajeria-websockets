@@ -10,7 +10,7 @@ import com.mensajeria.model.information.chat.request.Request;
 // como ya lo setea automáticamente, no hay problema
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.WRAPPER_OBJECT,
+        include = JsonTypeInfo.As.EXTERNAL_PROPERTY,
         property = "type"
 
 )

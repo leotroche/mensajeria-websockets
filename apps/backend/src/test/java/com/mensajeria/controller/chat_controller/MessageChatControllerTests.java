@@ -182,7 +182,7 @@ public class MessageChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Message message = (Message) response.payload();
+        Message message = (Message) response.getPayload();
 
         assertEquals("hola pepe", message.content());
         assertEquals("pepa", message.senderId());
@@ -204,7 +204,7 @@ public class MessageChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Message message = (Message) response.payload();
+        Message message = (Message) response.getPayload();
         assertEquals("hola pepa", message.content());
         assertEquals("pepe", message.senderId());
     }
@@ -221,7 +221,7 @@ public class MessageChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Message message = (Message) response.payload();
+        Message message = (Message) response.getPayload();
         assertEquals("hola fruta", message.content());
     }
 
@@ -235,7 +235,7 @@ public class MessageChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Message message = (Message) response.payload();
+        Message message = (Message) response.getPayload();
         assertEquals("hola fruta", message.content());
         assertEquals("pepe", message.senderId());
     }
@@ -370,7 +370,7 @@ public class MessageChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Message message = (Message) response.payload();
+        Message message = (Message) response.getPayload();
         assertEquals("hola pepa", message.content());
     }
 
@@ -398,8 +398,8 @@ public class MessageChatControllerTests {
         assertNotNull(pepeResponse);
         assertNotNull(pepaResponse);
 
-        Message pepeMessage = (Message) pepeResponse.payload();
-        Message pepaMessage = (Message) pepaResponse.payload();
+        Message pepeMessage = (Message) pepeResponse.getPayload();
+        Message pepaMessage = (Message) pepaResponse.getPayload();
 
         assertEquals(pepeMessage.createdAt(), pepaMessage.createdAt());
     }
@@ -426,7 +426,7 @@ public class MessageChatControllerTests {
 
         assertNotNull(pepeResponse);
 
-        Message pepeMessage = (Message) pepeResponse.payload();
+        Message pepeMessage = (Message) pepeResponse.getPayload();
 
         assertEquals("pepa", pepeMessage.chatId());
         assertEquals("pepe", pepeMessage.senderId());
@@ -454,7 +454,7 @@ public class MessageChatControllerTests {
 
         assertNotNull(pepaResponse);
 
-        Message pepeMessage = (Message) pepaResponse.payload();
+        Message pepeMessage = (Message) pepaResponse.getPayload();
 
         assertEquals("pepe", pepeMessage.chatId());
         assertEquals("pepe", pepeMessage.senderId());

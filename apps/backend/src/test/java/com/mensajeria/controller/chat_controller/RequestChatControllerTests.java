@@ -180,7 +180,7 @@ public class RequestChatControllerTests {
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        Request request = (Request) response.getPayload();
         assertEquals("pepe", request.senderId());
     }
 
@@ -195,7 +195,7 @@ public class RequestChatControllerTests {
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        Request request = (Request) response.getPayload();
         assertEquals("0", request.id());
     }
 
@@ -210,7 +210,7 @@ public class RequestChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        Request request = (Request) response.getPayload();
         assertEquals("pepa", request.chatId());
     }
 
@@ -225,7 +225,7 @@ public class RequestChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        Request request = (Request) response.getPayload();
         assertNull(request.chatId());
     }
 
@@ -240,7 +240,7 @@ public class RequestChatControllerTests {
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        Request request = (Request) response.getPayload();
         assertNull(request.chatId());
     }
 
