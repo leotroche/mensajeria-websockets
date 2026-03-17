@@ -22,4 +22,8 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AuthenticationException.class)
     public DTOResponseError authenticationException(AuthenticationException ex) {return new DTOResponseError(ex.getMessage());}
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public DTOResponseError illegalArgumentException(IllegalArgumentException ex) {return new DTOResponseError(ex.getMessage());}
 }
