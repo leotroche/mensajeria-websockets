@@ -1,6 +1,7 @@
 package com.mensajeria.controller;
 
 import com.mensajeria.model.information.Information;
+import com.mensajeria.model.information.InformationPayload;
 import com.mensajeria.model.information.chat.message.Message;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.message.MessagePayload;
@@ -68,7 +69,7 @@ public class ChatController {
     private void handleRequestMessageForStatus(SimpMessageHeaderAccessor headerAccessor, RequestPayload requestPayload, RequestStatus status) {
         Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
 
-        Request request = chatService.getInformationForRequest(requestPayload, authentication, status);
+        InformationPayload request = chatService.getInformationForRequest(requestPayload, authentication, status);
 
         Information information = new Information(request);
         sendToDestinatary(requestPayload.receiverId(), information);

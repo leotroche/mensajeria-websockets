@@ -175,7 +175,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa", "pepe", RequestStatus.PENDING));
+        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -190,7 +190,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa", "pepe", RequestStatus.PENDING));
+        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -205,7 +205,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa", "pepa", RequestStatus.ACCEPTED));
+        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -220,7 +220,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa", "pepa", RequestStatus.REJECTED));
+        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
@@ -235,7 +235,7 @@ public class RequestChatControllerTests {
         pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
         pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
 
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa", "pepa", RequestStatus.PENDING));
+        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
 
         Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);

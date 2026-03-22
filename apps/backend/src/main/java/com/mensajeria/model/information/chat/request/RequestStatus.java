@@ -1,11 +1,13 @@
 package com.mensajeria.model.information.chat.request;
 
+import com.mensajeria.model.information.InformationPayload;
+
 public enum RequestStatus {
     PENDING,
     ACCEPTED,
     REJECTED;
 
-    public Request getRequestFromPayload(RequestPayload payload, String senderName, Long createdAt, String chatId) {
+    public InformationPayload getRequestFromPayload(RequestPayload payload, String senderName, Long createdAt, String chatId) {
 
         switch (this) {
             case PENDING -> {

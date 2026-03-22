@@ -81,8 +81,8 @@ public class MessageChatControllerTests {
 
         pepeToken = getToken(webClient, pepeLoginRequest);
 
-        validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "canal1");
-        validStompHeadersForSend = getStompHeadersForSend(pepeToken, "canal1");
+        validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
+        validStompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
 
         pepeSession = connectToChat(pepeToken);
 
@@ -97,8 +97,8 @@ public class MessageChatControllerTests {
 
         pepaToken = getToken(webClient, pepaLoginRequest);
 
-        pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken, "canal1");
-        pepaStompHeadersSend = getStompHeadersForSend(pepaToken, "canal1");
+        pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken, "pepa");
+        pepaStompHeadersSend = getStompHeadersForSend(pepaToken, "pepe");
 
         pepaSession = connectToChat(pepaToken);
 
@@ -208,8 +208,6 @@ public class MessageChatControllerTests {
         assertEquals("hola pepa", message.content());
         assertEquals("pepe", message.senderId());
     }
-
-
 
     @Test
     void shouldSendAndReceiveMessage() throws Exception {

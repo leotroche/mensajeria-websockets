@@ -1,5 +1,6 @@
 package com.mensajeria.service;
 
+import com.mensajeria.model.information.InformationPayload;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.message.MessagePayload;
 import com.mensajeria.model.exception.UserNotFoundException;
@@ -34,7 +35,7 @@ public class ChatServiceImpl {
         return new MessageDraft(messagePayload.id(), senderName, messagePayload.content(), createdAt);
     }
 
-    public Request getInformationForRequest(RequestPayload requestPayload, Authentication auth, RequestStatus status) {
+    public InformationPayload getInformationForRequest(RequestPayload requestPayload, Authentication auth, RequestStatus status) {
         String senderName = getAuthName(auth);
 
         Long createdAt = Instant.now().toEpochMilli();
