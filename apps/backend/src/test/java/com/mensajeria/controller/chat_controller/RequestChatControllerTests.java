@@ -1,13 +1,14 @@
 package com.mensajeria.controller.chat_controller;
 
-import com.mensajeria.controller.dto.payload.ChatPayload;
+import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.model.information.Information;
-import com.mensajeria.controller.dto.payload.RequestAcceptRejectPayload;
+import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
 import com.mensajeria.model.information.chat.Chat;
 import com.mensajeria.model.information.chat.request.SendRequest;
+import com.mensajeria.model.information.contact.Contact;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,7 +124,7 @@ public class RequestChatControllerTests {
 
         return stompClient
                 .connectAsync(
-                        "ws://localhost:" + port + "/chats", // TODO pasar a .env
+                        "ws://localhost:" + port + "/chats",
                         handshakeHeaders,
                         connectHeaders,
                         new StompSessionHandlerAdapter() {}
@@ -141,21 +142,14 @@ public class RequestChatControllerTests {
 
     private static StompHeaders getStompHeadersForAccept(String token) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/chats/requests/accept");
-        stompHeaders.add("Authorization", "Bearer " + token);
-        return stompHeaders;
-    }
-
-    private static StompHeaders getStompHeadersForReject(String token) {
-        StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/chats/requests/reject");
+        stompHeaders.setDestination("/app/requests/accept");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
 
     private static StompHeaders getStompHeadersForSend(String token) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/chats/requests/send");
+        stompHeaders.setDestination("/app/requests/send");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -189,43 +183,51 @@ public class RequestChatControllerTests {
 
         StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-        Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
-        ChatPayload chatPayload = new ChatPayload("pepa", chat);
-        pepeSession.send(sendHeaders, chatPayload);
+
+        Contact contact = new Contact("pepe", "pepe");
+        RequestSendPayload requestSendPayload = new RequestSendPayload("UUID", contact, "pepa");
+        pepeSession.send(sendHeaders, requestSendPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
         SendRequest request = (SendRequest) response.payload();
-        assertEquals("pepe", request.chat().name());
+        assertEquals("pepe", request.sender().name());
     }
 
     @Test
     void sendRequestAndReceiveTheIdOfIt() throws Exception {
 
-        StompHeaders acceptHeaders = getStompHeadersForAccept(pepeToken);
+        StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-        pepeSession.send(acceptHeaders, new RequestAcceptRejectPayload("0", "pepa"));
+
+        Contact contact = new Contact("pepe", "pepe");
+        RequestSendPayload requestSendPayload = new RequestSendPayload("UUID", contact, "pepa");
+        pepeSession.send(sendHeaders, requestSendPayload);
+
+        Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
+        assertNotNull(response);
+
+        SendRequest request = (SendRequest) response.payload();
+        assertEquals("UUID", request.id());
+    }
+
+    @Test
+    void acceptRequestAndReceiveChat() throws Exception {
+
+        StompHeaders sendHeaders = getStompHeadersForAccept(pepeToken);
+
+        Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
+        RequestAcceptPayload requestAcceptPayload = new RequestAcceptPayload(chat, "pepa");
+        pepeSession.send(sendHeaders, requestAcceptPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
         AcceptRequest request = (AcceptRequest) response.payload();
-        assertEquals("0", request.id());
+        assertEquals("pepe", request.chat().id());
     }
 
-//    @Test
-//    void approvedRequestSendsItsChatId() throws Exception {
-//
-//        StompHeaders acceptHeaders = getStompHeadersForAccept(pepeToken);
-//        pepeSession.send(pepaStompHeadersSend, new RequestAcceptRejectPayload("0", "pepa"));
-//
-//        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-//        assertNotNull(response);
-//
-//        Request request = (Request) response.payload();
-//        assertEquals("pepa", request.chatId());
-//    }
 
 
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {

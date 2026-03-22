@@ -20,7 +20,6 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class JwtUtils {
@@ -65,7 +64,7 @@ public class JwtUtils {
     }
 
     public String verifyThenGetUsernameFromJwtToken(String token) {
-        // verifies the auth is valid, then returns the username
+        // verifies the auth is valid, then returns the name
         return Jwts.parser()
                 .verifyWith((SecretKey) key())
                 .build().parseSignedClaims(token)
@@ -101,19 +100,19 @@ public class JwtUtils {
         return null;
     }
 
-    public Authentication getAuthFromHeader(ServerHttpRequest request) {
+    public Authentication validateAndGetAuthFromHeader(ServerHttpRequest request) {
 
         String token = request.getHeaders().getFirst("Authorization");
         return validateAndGetAuth(token);
     }
 
-    public Authentication getAuthFromHeader(StompHeaderAccessor accessor) {
+    public Authentication validateAndGetAuthFromHeader(StompHeaderAccessor accessor) {
 
         String token = accessor.getFirstNativeHeader("Authorization");
         return validateAndGetAuth(token);
     }
 
-    public Authentication getAuthFromHeader(SimpMessageHeaderAccessor request) {
+    public Authentication validateAndGetAuthFromHeader(SimpMessageHeaderAccessor request) {
 
         String token = request.getFirstNativeHeader("Authorization");
         return validateAndGetAuth(token);

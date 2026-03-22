@@ -32,7 +32,7 @@ public class ValidCommandChannelInterceptor implements ChannelInterceptor {
                 )
         ) return message;
 
-        Authentication auth = jwtUtils.getAuthFromHeader(accessor);
+        Authentication auth = jwtUtils.validateAndGetAuthFromHeader(accessor);
         logUser(accessor, auth);
         return message;
     }

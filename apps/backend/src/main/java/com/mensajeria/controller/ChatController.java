@@ -1,12 +1,12 @@
 package com.mensajeria.controller;
 
-import com.mensajeria.controller.dto.payload.ChatPayload;
+import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.model.information.Information;
 import com.mensajeria.model.information.InformationPayload;
 import com.mensajeria.model.information.chat.message.Message;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.controller.dto.payload.MessagePayload;
-import com.mensajeria.controller.dto.payload.RequestAcceptRejectPayload;
+import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.utils.JwtUtils;
 import com.mensajeria.service.ChatServiceImpl;
@@ -29,59 +29,32 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
 
-//    @MessageMapping("chats/requests/{receiverId}")
-//    public void getFriendRequest(@DestinationVariable String receiverId, RequestPayload requestPayload, SimpMessageHeaderAccessor headerAccessor) {
-//
-//        System.out.println("Someone sent / answered a friend request to " + receiverId + ":" + requestPayload);
-//
-//        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
-//
-//        Request request = chatService.getInformationFromRequest(requestPayload, authentication);
-//
-//        Information information = new Information(request);
-//        sendToDestinatary(receiverId, information);
-//
-//    }
 
-    @MessageMapping("chats/requests/send")
-    public void getFriendRequest(ChatPayload chatPayload, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("requests/send")
+    public void getFriendRequest(RequestSendPayload requestSendPayload, SimpMessageHeaderAccessor headerAccessor) {
 
         System.out.println("Someone sent a friend request");
 
-        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
+        jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
-        SendRequest request = chatService.getInformationForRequest(chatPayload, authentication);
+        SendRequest request = chatService.getInformationForRequest(requestSendPayload);
 
         Information information = new Information(request);
-        sendToDestinatary(chatPayload.receiverId(), information);
+        sendToDestinatary(requestSendPayload.receiverId(), information);
 
     }
 
-    @MessageMapping("chats/requests/accept")
-    public void acceptFriendRequest(RequestAcceptRejectPayload requestAcceptRejectPayload, SimpMessageHeaderAccessor headerAccessor) {
+    @MessageMapping("requests/accept")
+    public void acceptFriendRequest(RequestAcceptPayload requestAcceptPayload, SimpMessageHeaderAccessor headerAccessor) {
 
-        System.out.println("Someone sent / answered a friend request to " + requestAcceptRejectPayload.receiverId() + ":" + requestAcceptRejectPayload);
+        System.out.println("Someone sent / answered a friend request to " + requestAcceptPayload.receiverId() + ":" + requestAcceptPayload);
 
-        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
+        Authentication authentication = jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
-        InformationPayload request = chatService.getInformationForAcceptRequest(requestAcceptRejectPayload, authentication);
-
-        Information information = new Information(request);
-        sendToDestinatary(requestAcceptRejectPayload.receiverId(), information);
-
-    }
-
-    @MessageMapping("chats/requests/reject")
-    public void rejectFriendRequest(RequestAcceptRejectPayload requestAcceptRejectPayload, SimpMessageHeaderAccessor headerAccessor) {
-
-        System.out.println("Someone sent / answered a friend request to " + requestAcceptRejectPayload.receiverId() + ":" + requestAcceptRejectPayload);
-
-        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
-
-        InformationPayload request = chatService.getInformationForRejectRequest(requestAcceptRejectPayload, authentication);
+        InformationPayload request = chatService.getInformationForAcceptRequest(requestAcceptPayload);
 
         Information information = new Information(request);
-        sendToDestinatary(requestAcceptRejectPayload.receiverId(), information);
+        sendToDestinatary(requestAcceptPayload.receiverId(), information);
 
     }
 
@@ -92,7 +65,7 @@ public class ChatController {
 
         // Get auth for analysis
 
-        Authentication authentication = jwtUtils.getAuthFromHeader(headerAccessor);
+        Authentication authentication = jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
         // Generate message (and bounce)
 

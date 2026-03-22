@@ -25,7 +25,7 @@ public class ConnectHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler, Map<String, Object> attributes) {
         // TODO borrar si no se va a usar
 
-        Authentication auth = jwtUtils.getAuthFromHeader(request);
+        Authentication auth = jwtUtils.validateAndGetAuthFromHeader(request);
 
         if (auth == null) return reject(response);
 

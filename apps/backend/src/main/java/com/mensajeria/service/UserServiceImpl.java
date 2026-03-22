@@ -46,7 +46,7 @@ public class UserServiceImpl {
     }
 
     public LoginResponse create(String username, String password) {
-        // TODO chequeos a los strings de username y password
+        // TODO chequeos a los strings de name y password
         userDAOJDBC.save(username, password);
 
         LoginRequest loginRequest = new LoginRequest(username, password);
