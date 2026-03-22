@@ -17,11 +17,11 @@ import java.time.Instant;
 import java.util.Optional;
 
 @Service
-public class ChatServiceImpl {
+public class MessageServiceImpl {
 
     private final UserDAOJPA userDAOJPA;
 
-    public ChatServiceImpl(UserDAOJPA userDAO) {
+    public MessageServiceImpl(UserDAOJPA userDAO) {
         userDAOJPA = userDAO;
     }
 
@@ -33,20 +33,6 @@ public class ChatServiceImpl {
 
         return new MessageDraft(messagePayload.id(), senderName, messagePayload.content(), createdAt);
     }
-
-    public AcceptRequest getInformationForAcceptRequest(RequestAcceptPayload requestAcceptPayload) {
-
-        return new AcceptRequest(requestAcceptPayload.chat());
-    }
-
-    public SendRequest getInformationForRequest(RequestSendPayload requestSendPayload) {
-
-        Long createdAt = Instant.now().toEpochMilli();
-
-        return new SendRequest(requestSendPayload.id(), requestSendPayload.sender(), createdAt);
-        // TODO acá receiverId se vuelve chatId, habría que tomar chatId posiblemente de otro lado
-    }
-
 
 
     private @NonNull String getAuthName(Authentication auth) {

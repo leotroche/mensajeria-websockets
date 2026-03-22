@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class MessageChatControllerTests {
+public class MessageMessageControllerTests {
 
     @LocalServerPort
     private int port;

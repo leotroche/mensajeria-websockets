@@ -1,16 +1,12 @@
-package com.mensajeria.controller;
+package com.mensajeria.controller.chat;
 
 import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.model.information.Information;
 import com.mensajeria.model.information.InformationPayload;
-import com.mensajeria.model.information.chat.message.Message;
-import com.mensajeria.model.information.chat.message.MessageDraft;
-import com.mensajeria.controller.dto.payload.MessagePayload;
 import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.model.information.chat.request.SendRequest;
+import com.mensajeria.service.RequestServiceImpl;
 import com.mensajeria.utils.JwtUtils;
-import com.mensajeria.service.ChatServiceImpl;
-import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -18,13 +14,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class ChatController {
-    private final ChatServiceImpl chatService;
+public class RequestController {
+    private final RequestServiceImpl requestService;
     private final JwtUtils jwtUtils;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public ChatController(ChatServiceImpl chatService, JwtUtils jwtUtils, SimpMessagingTemplate messagingTemplate) {
-        this.chatService = chatService;
+    public RequestController(RequestServiceImpl requestService, JwtUtils jwtUtils, SimpMessagingTemplate messagingTemplate) {
+        this.requestService = requestService;
         this.jwtUtils = jwtUtils;
         this.messagingTemplate = messagingTemplate; // se encarga de mandar mensajes
     }
@@ -37,7 +33,7 @@ public class ChatController {
 
         jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
-        SendRequest request = chatService.getInformationForRequest(requestSendPayload);
+        SendRequest request = requestService.getInformationForRequest(requestSendPayload);
 
         Information information = new Information(request);
         sendToDestinatary(requestSendPayload.receiverId(), information);
@@ -51,38 +47,10 @@ public class ChatController {
 
         Authentication authentication = jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
-        InformationPayload request = chatService.getInformationForAcceptRequest(requestAcceptPayload);
+        InformationPayload request = requestService.getInformationForAcceptRequest(requestAcceptPayload);
 
         Information information = new Information(request);
         sendToDestinatary(requestAcceptPayload.receiverId(), information);
-
-    }
-
-    @MessageMapping("chats/{chatId}")
-    public void getMessage(@DestinationVariable String chatId, MessagePayload messagePayload, SimpMessageHeaderAccessor headerAccessor) {
-
-        System.out.println("Got message for channel " + chatId + ":" + messagePayload);
-
-        // Get auth for analysis
-
-        Authentication authentication = jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
-
-        // Generate message (and bounce)
-
-        MessageDraft messageDraft = chatService.getInformationFromMessage(messagePayload, authentication);
-
-        Message messageToDestiny = Message.fromDraft(messageDraft, messageDraft.senderId());
-        Message messageBounce = Message.fromDraft(messageDraft, chatId);
-
-        // Send the information
-
-        Information information = new Information(messageToDestiny);
-        sendToDestinatary(chatId, information);
-
-        // rebote de info
-//        information.setPayload(messageBounce);
-        information = new Information(messageBounce);
-        sendToDestinatary(messageDraft.senderId(), information);
 
     }
 
