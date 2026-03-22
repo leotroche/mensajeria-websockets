@@ -1,15 +1,15 @@
 package com.mensajeria.service;
 
-import com.mensajeria.model.information.InformationPayload;
+import com.mensajeria.controller.dto.payload.ChatPayload;
 import com.mensajeria.model.information.chat.message.MessageDraft;
-import com.mensajeria.model.information.chat.message.MessagePayload;
+import com.mensajeria.controller.dto.payload.MessagePayload;
 import com.mensajeria.model.exception.UserNotFoundException;
-import com.mensajeria.model.information.chat.request.Request;
-import com.mensajeria.model.information.chat.request.RequestPayload;
-import com.mensajeria.model.information.chat.request.RequestStatus;
+import com.mensajeria.model.information.chat.request.AcceptRequest;
+import com.mensajeria.model.information.chat.request.RejectRequest;
+import com.mensajeria.controller.dto.payload.RequestAcceptRejectPayload;
+import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
-import com.mensajeria.utils.JwtUtils;
 import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -35,12 +35,28 @@ public class ChatServiceImpl {
         return new MessageDraft(messagePayload.id(), senderName, messagePayload.content(), createdAt);
     }
 
-    public InformationPayload getInformationForRequest(RequestPayload requestPayload, Authentication auth, RequestStatus status) {
+    public AcceptRequest getInformationForAcceptRequest(RequestAcceptRejectPayload requestAcceptRejectPayload, Authentication auth) {
         String senderName = getAuthName(auth);
 
         Long createdAt = Instant.now().toEpochMilli();
 
-        return status.getRequestFromPayload(requestPayload, senderName, createdAt, senderName);
+        return new AcceptRequest(requestAcceptRejectPayload.id(), createdAt);
+    }
+
+    public RejectRequest getInformationForRejectRequest(RequestAcceptRejectPayload requestAcceptRejectPayload, Authentication auth) {
+        String senderName = getAuthName(auth);
+
+        Long createdAt = Instant.now().toEpochMilli();
+
+        return new RejectRequest(requestAcceptRejectPayload.id(), senderName, createdAt);
+        // TODO acá receiverId se vuelve chatId, habría que tomar chatId posiblemente de otro lado
+    }
+
+    public SendRequest getInformationForRequest(ChatPayload chatPayload, Authentication auth) {
+
+        Long createdAt = Instant.now().toEpochMilli();
+
+        return new SendRequest(chatPayload.chat(), createdAt);
         // TODO acá receiverId se vuelve chatId, habría que tomar chatId posiblemente de otro lado
     }
 

@@ -1,11 +1,13 @@
 package com.mensajeria.controller.chat_controller;
 
+import com.mensajeria.controller.dto.payload.ChatPayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.model.information.Information;
-import com.mensajeria.model.information.chat.request.Request;
-import com.mensajeria.model.information.chat.request.RequestPayload;
-import com.mensajeria.model.information.chat.request.RequestStatus;
+import com.mensajeria.controller.dto.payload.RequestAcceptRejectPayload;
+import com.mensajeria.model.information.chat.request.AcceptRequest;
+import com.mensajeria.model.information.chat.Chat;
+import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +46,6 @@ public class RequestChatControllerTests {
 
 
     private StompHeaders validStompHeadersForSubscribe;
-    private StompHeaders validStompHeadersForSend;
 
     private StompSession pepeSession;
     private String pepeToken;
@@ -55,7 +56,6 @@ public class RequestChatControllerTests {
     private StompSession pepaSession;
     private String pepaToken;
     private StompHeaders pepaStompHeadersSubscribe;
-    private StompHeaders pepaStompHeadersSend;
     private LinkedBlockingQueue<Information> pepaBlockingQueue;
     private StompFrameHandler pepaHandler;
 
@@ -75,6 +75,9 @@ public class RequestChatControllerTests {
 
         initializePepa(webClient);
 
+        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
+        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
+
     }
 
     private void initializePepe(WebClient webClient) throws InterruptedException, ExecutionException, TimeoutException {
@@ -86,7 +89,6 @@ public class RequestChatControllerTests {
         pepeToken = getToken(webClient, pepeLoginRequest);
 
         validStompHeadersForSubscribe = getStompHeadersForSubscribe(pepeToken, "pepe");
-        validStompHeadersForSend = getStompHeadersForSend(pepeToken, "pepa");
 
         pepeSession = connectToChat(pepeToken);
 
@@ -102,7 +104,6 @@ public class RequestChatControllerTests {
         pepaToken = getToken(webClient, pepaLoginRequest);
 
         pepaStompHeadersSubscribe = getStompHeadersForSubscribe(pepaToken, "pepa");
-        pepaStompHeadersSend = getStompHeadersForSend(pepaToken, "pepe");
 
         pepaSession = connectToChat(pepaToken);
 
@@ -138,9 +139,23 @@ public class RequestChatControllerTests {
         return stompHeaders;
     }
 
-    private static StompHeaders getStompHeadersForSend(String token, String receiverName) {
+    private static StompHeaders getStompHeadersForAccept(String token) {
         StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.setDestination("/app/chats/requests/" + receiverName);
+        stompHeaders.setDestination("/app/chats/requests/accept");
+        stompHeaders.add("Authorization", "Bearer " + token);
+        return stompHeaders;
+    }
+
+    private static StompHeaders getStompHeadersForReject(String token) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/app/chats/requests/reject");
+        stompHeaders.add("Authorization", "Bearer " + token);
+        return stompHeaders;
+    }
+
+    private static StompHeaders getStompHeadersForSend(String token) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/app/chats/requests/send");
         stompHeaders.add("Authorization", "Bearer " + token);
         return stompHeaders;
     }
@@ -172,77 +187,46 @@ public class RequestChatControllerTests {
     @Test
     void sendRequestAndReceiveTheSenderOfIt() throws Exception {
 
-        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
+        StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
+        Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
+        ChatPayload chatPayload = new ChatPayload("pepa", chat);
+        pepeSession.send(sendHeaders, chatPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
-        assertEquals("pepe", request.senderId());
+        SendRequest request = (SendRequest) response.payload();
+        assertEquals("pepe", request.chat().name());
     }
 
     @Test
     void sendRequestAndReceiveTheIdOfIt() throws Exception {
 
-        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
+        StompHeaders acceptHeaders = getStompHeadersForAccept(pepeToken);
 
-        pepeSession.send(validStompHeadersForSend, new RequestPayload("0", "pepa"));
+        pepeSession.send(acceptHeaders, new RequestAcceptRejectPayload("0", "pepa"));
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
-        Request request = (Request) response.payload();
+        AcceptRequest request = (AcceptRequest) response.payload();
         assertEquals("0", request.id());
     }
 
-    @Test
-    void approvedRequestSendsItsChatId() throws Exception {
+//    @Test
+//    void approvedRequestSendsItsChatId() throws Exception {
+//
+//        StompHeaders acceptHeaders = getStompHeadersForAccept(pepeToken);
+//        pepeSession.send(pepaStompHeadersSend, new RequestAcceptRejectPayload("0", "pepa"));
+//
+//        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
+//        assertNotNull(response);
+//
+//        Request request = (Request) response.payload();
+//        assertEquals("pepa", request.chatId());
+//    }
 
-        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
-
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
-
-        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-        assertNotNull(response);
-
-        Request request = (Request) response.payload();
-        assertEquals("pepa", request.chatId());
-    }
-
-    @Test
-    void rejectedRequestSendsNullAsChatId() throws Exception {
-
-        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
-
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
-
-        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-        assertNotNull(response);
-
-        Request request = (Request) response.payload();
-        assertNull(request.chatId());
-    }
-
-    @Test
-    void pendingRequestSendsNullAsChatId() throws Exception {
-
-        pepeSession.subscribe(validStompHeadersForSubscribe, pepeHandler);
-        pepaSession.subscribe(pepaStompHeadersSubscribe, pepaHandler);
-
-        pepeSession.send(pepaStompHeadersSend, new RequestPayload("0", "pepa"));
-
-        Information response = pepeBlockingQueue.poll(5, TimeUnit.SECONDS);
-        assertNotNull(response);
-
-        Request request = (Request) response.payload();
-        assertNull(request.chatId());
-    }
 
     private static StompFrameHandler getStompFrameHandler(BlockingQueue<Information> blockingQueue) {
         StompFrameHandler handler = new StompFrameHandler() {

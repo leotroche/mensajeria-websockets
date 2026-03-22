@@ -2,7 +2,7 @@ package com.mensajeria.controller.chat_controller;
 
 import com.mensajeria.model.information.Information;
 import com.mensajeria.model.information.chat.message.Message;
-import com.mensajeria.model.information.chat.message.MessagePayload;
+import com.mensajeria.controller.dto.payload.MessagePayload;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.utils.TestService;
