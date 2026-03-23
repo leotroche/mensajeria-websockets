@@ -1,8 +1,9 @@
 package com.mensajeria.controller.dto.payload.data;
 
+import com.mensajeria.model.Contact;
+
 public record RequestSendData(String requestId,
-                              String senderChatId,
-                              String senderName,
+                              Contact contact,
                               Long createdAt
 ) {
 }

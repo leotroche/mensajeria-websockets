@@ -8,4 +8,4 @@ public record Chat(
         long updatedAt,
         int unreadCount,
         String lastMessage
-) {}
+) implements ChatInterface{}

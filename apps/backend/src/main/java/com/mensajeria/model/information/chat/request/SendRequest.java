@@ -4,8 +4,8 @@ import com.mensajeria.controller.dto.payload.InformationPayload;
 import com.mensajeria.model.Contact;
 
 public record SendRequest(
-        String id,
-        Contact sender,
+        String receiverId,
+        Contact contact,
         Long createdAt
 ) implements InformationPayload {
 }

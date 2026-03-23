@@ -5,6 +5,7 @@ import com.mensajeria.controller.dto.payload.data.RequestAcceptData;
 import com.mensajeria.controller.dto.payload.data.RequestSendData;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
+import com.mensajeria.model.Contact;
 import com.mensajeria.model.information.Information;
 import com.mensajeria.controller.dto.payload.RequestAcceptConfirmPayload;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
@@ -192,7 +193,7 @@ public class RequestControllerTests {
 
         StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-        RequestSendData data = new RequestSendData("UUID", "pepe", "pepe", 121424545L);
+        RequestSendData data = new RequestSendData("UUID", new Contact("pepe", "pepe", "pepe", "pepe.png"), 121424545L);
         RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 
@@ -200,7 +201,7 @@ public class RequestControllerTests {
         assertNotNull(response);
 
         SendRequest request = (SendRequest) response.payload();
-        assertEquals("pepe", request.sender().senderName());
+        assertEquals("pepe", request.contact().name());
     }
 
     @Test
@@ -208,7 +209,7 @@ public class RequestControllerTests {
 
         StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-        RequestSendData data = new RequestSendData("UUID", "pepe", "pepe", 121424545L);
+        RequestSendData data = new RequestSendData("UUID", new Contact("pepe", "pepe", "pepe", "pepe.png"), 121424545L);
         RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 
@@ -216,7 +217,7 @@ public class RequestControllerTests {
         assertNotNull(response);
 
         SendRequest request = (SendRequest) response.payload();
-        assertEquals("UUID", request.id());
+        assertEquals("pepe", request.contact().id());
     }
 
     @Test
@@ -225,8 +226,7 @@ public class RequestControllerTests {
         StompHeaders sendHeaders = getStompHeadersForAccept(pepeToken);
 
         Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
-        RequestAcceptData data = new RequestAcceptData(chat);
-        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(data, "pepa");
+        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(chat, "pepa");
         pepeSession.send(sendHeaders, requestAcceptConfirmPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
@@ -242,8 +242,7 @@ public class RequestControllerTests {
         StompHeaders sendHeaders = getStompHeadersForConfirm(pepeToken);
 
         Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
-        RequestAcceptData data = new RequestAcceptData(chat);
-        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(data, "pepa");
+        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(chat, "pepa");
         pepeSession.send(sendHeaders, requestAcceptConfirmPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
