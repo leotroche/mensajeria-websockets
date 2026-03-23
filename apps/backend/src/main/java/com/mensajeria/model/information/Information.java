@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.mensajeria.controller.dto.payload.InformationPayload;
 import com.mensajeria.model.information.chat.message.Message;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
+import com.mensajeria.model.information.chat.request.ConfirmRequest;
 import com.mensajeria.model.information.chat.request.SendRequest;
 
 public record Information(
@@ -22,7 +23,8 @@ public record Information(
         @JsonSubTypes({
                 @JsonSubTypes.Type(value = Message.class, name = "message:received"),
                 @JsonSubTypes.Type(value = SendRequest.class, name = "request:received"),
-                @JsonSubTypes.Type(value = AcceptRequest.class, name = "request:accepted")
+                @JsonSubTypes.Type(value = AcceptRequest.class, name = "request:accepted"),
+                @JsonSubTypes.Type(value = ConfirmRequest.class, name = "request:accepted:confirm")
         })
         InformationPayload payload
 ) {

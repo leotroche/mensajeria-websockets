@@ -3,14 +3,13 @@ package com.mensajeria.controller.chat;
 import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.model.information.Information;
 import com.mensajeria.controller.dto.payload.InformationPayload;
-import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
+import com.mensajeria.controller.dto.payload.RequestAcceptConfirmPayload;
 import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.service.RequestServiceImpl;
 import com.mensajeria.utils.JwtUtils;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -41,16 +40,30 @@ public class RequestController {
     }
 
     @MessageMapping("requests/accept")
-    public void acceptFriendRequest(RequestAcceptPayload requestAcceptPayload, SimpMessageHeaderAccessor headerAccessor) {
+    public void acceptFriendRequest(RequestAcceptConfirmPayload requestAcceptConfirmPayload, SimpMessageHeaderAccessor headerAccessor) {
 
-        System.out.println("Someone sent / answered a friend request to " + requestAcceptPayload.receiverId() + ":" + requestAcceptPayload);
+        System.out.println("Someone answered a friend request to " + requestAcceptConfirmPayload.receiverId());
 
         jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
-        InformationPayload request = requestService.getInformationForAcceptRequest(requestAcceptPayload);
+        InformationPayload request = requestService.getInformationForAcceptRequest(requestAcceptConfirmPayload);
 
         Information information = new Information(request);
-        sendToDestinatary(requestAcceptPayload.receiverId(), information);
+        sendToDestinatary(requestAcceptConfirmPayload.receiverId(), information);
+
+    }
+
+    @MessageMapping("requests/accept/confirm")
+    public void confirmFriendRequest(RequestAcceptConfirmPayload requestAcceptConfirmPayload, SimpMessageHeaderAccessor headerAccessor) {
+
+        System.out.println("Someone answered a friend request to " + requestAcceptConfirmPayload.receiverId());
+
+        jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
+
+        InformationPayload request = requestService.getInformationForConfirmRequest(requestAcceptConfirmPayload);
+
+        Information information = new Information(request);
+        sendToDestinatary(requestAcceptConfirmPayload.receiverId(), information);
 
     }
 

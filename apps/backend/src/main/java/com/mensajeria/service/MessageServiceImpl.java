@@ -1,12 +1,8 @@
 package com.mensajeria.service;
 
-import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.controller.dto.payload.MessagePayload;
 import com.mensajeria.model.exception.UserNotFoundException;
-import com.mensajeria.model.information.chat.request.AcceptRequest;
-import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
-import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.persistency.dao.jpa.UserDAOJPA;
 import com.mensajeria.persistency.repositories.sql.user.UserRepositoryJPA;
 import org.jspecify.annotations.NonNull;

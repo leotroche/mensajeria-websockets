@@ -6,9 +6,10 @@ import com.mensajeria.controller.dto.payload.data.RequestSendData;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.model.information.Information;
-import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
+import com.mensajeria.controller.dto.payload.RequestAcceptConfirmPayload;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
 import com.mensajeria.model.information.chat.Chat;
+import com.mensajeria.model.information.chat.request.ConfirmRequest;
 import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
@@ -148,6 +149,13 @@ public class RequestControllerTests {
         return stompHeaders;
     }
 
+    private static StompHeaders getStompHeadersForConfirm(String token) {
+        StompHeaders stompHeaders = new StompHeaders();
+        stompHeaders.setDestination("/app/requests/accept/confirm");
+        stompHeaders.add("Authorization", "Bearer " + token);
+        return stompHeaders;
+    }
+
     private static StompHeaders getStompHeadersForSend(String token) {
         StompHeaders stompHeaders = new StompHeaders();
         stompHeaders.setDestination("/app/requests/send");
@@ -218,13 +226,30 @@ public class RequestControllerTests {
 
         Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
         RequestAcceptData data = new RequestAcceptData(chat);
-        RequestAcceptPayload requestAcceptPayload = new RequestAcceptPayload(data, "pepa");
-        pepeSession.send(sendHeaders, requestAcceptPayload);
+        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(data, "pepa");
+        pepeSession.send(sendHeaders, requestAcceptConfirmPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
         assertNotNull(response);
 
         AcceptRequest request = (AcceptRequest) response.payload();
+        assertEquals("pepe", request.chat().id());
+    }
+
+    @Test
+    void confirmRequestAndReceiveChat() throws Exception {
+
+        StompHeaders sendHeaders = getStompHeadersForConfirm(pepeToken);
+
+        Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
+        RequestAcceptData data = new RequestAcceptData(chat);
+        RequestAcceptConfirmPayload requestAcceptConfirmPayload = new RequestAcceptConfirmPayload(data, "pepa");
+        pepeSession.send(sendHeaders, requestAcceptConfirmPayload);
+
+        Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
+        assertNotNull(response);
+
+        ConfirmRequest request = (ConfirmRequest) response.payload();
         assertEquals("pepe", request.chat().id());
     }
 
