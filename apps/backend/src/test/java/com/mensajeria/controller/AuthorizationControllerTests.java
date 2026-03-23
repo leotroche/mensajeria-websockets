@@ -143,7 +143,7 @@ public class AuthorizationControllerTests {
         dataNode = root.get("data");
         UserInfoData userData = mapper.treeToValue(dataNode, UserInfoData.class);
 
-        assertEquals("3", userData.userId()); // TODO esto podría llegar a cambiar (por el id)
+        assertEquals("3", userData.userId()); // TODO esto podría llegar a cambiar (por el chatId)
     }
 
     @AfterEach

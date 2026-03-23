@@ -3,6 +3,7 @@ package com.mensajeria.service;
 import com.mensajeria.controller.dto.payload.MessagePayload;
 import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.controller.dto.payload.RequestSendPayload;
+import com.mensajeria.controller.dto.payload.data.RequestSendData;
 import com.mensajeria.model.exception.UserNotFoundException;
 import com.mensajeria.model.information.chat.message.MessageDraft;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
@@ -27,14 +28,14 @@ public class RequestServiceImpl {
 
     public AcceptRequest getInformationForAcceptRequest(RequestAcceptPayload requestAcceptPayload) {
 
-        return new AcceptRequest(requestAcceptPayload.chat());
+        return new AcceptRequest(requestAcceptPayload.data().chat());
     }
 
     public SendRequest getInformationForRequest(RequestSendPayload requestSendPayload) {
 
-        Long createdAt = Instant.now().toEpochMilli();
+        RequestSendData data = requestSendPayload.data();
 
-        return new SendRequest(requestSendPayload.id(), requestSendPayload.sender(), createdAt);
+        return new SendRequest(data.id(), data.sender(), data.createdAt());
         // TODO acá receiverId se vuelve chatId, habría que tomar chatId posiblemente de otro lado
     }
 

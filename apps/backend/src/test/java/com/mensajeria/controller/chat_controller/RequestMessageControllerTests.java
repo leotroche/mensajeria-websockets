@@ -1,6 +1,8 @@
 package com.mensajeria.controller.chat_controller;
 
 import com.mensajeria.controller.dto.payload.RequestSendPayload;
+import com.mensajeria.controller.dto.payload.data.RequestAcceptData;
+import com.mensajeria.controller.dto.payload.data.RequestSendData;
 import com.mensajeria.controller.dto.security.LoginData;
 import com.mensajeria.controller.dto.security.login.LoginRequest;
 import com.mensajeria.model.information.Information;
@@ -185,7 +187,8 @@ public class RequestMessageControllerTests {
 
 
         Contact contact = new Contact("pepe", "pepe");
-        RequestSendPayload requestSendPayload = new RequestSendPayload("UUID", contact, "pepa");
+        RequestSendData data = new RequestSendData("UUID", contact, 121424545L);
+        RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
@@ -202,7 +205,8 @@ public class RequestMessageControllerTests {
 
 
         Contact contact = new Contact("pepe", "pepe");
-        RequestSendPayload requestSendPayload = new RequestSendPayload("UUID", contact, "pepa");
+        RequestSendData data = new RequestSendData("UUID", contact, 121424545L);
+        RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);
@@ -218,7 +222,8 @@ public class RequestMessageControllerTests {
         StompHeaders sendHeaders = getStompHeadersForAccept(pepeToken);
 
         Chat chat = new Chat("pepe", "pepe", "pepe.png", 212164L, 4545L, 0, null);
-        RequestAcceptPayload requestAcceptPayload = new RequestAcceptPayload(chat, "pepa");
+        RequestAcceptData data = new RequestAcceptData(chat);
+        RequestAcceptPayload requestAcceptPayload = new RequestAcceptPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestAcceptPayload);
 
         Information response = pepaBlockingQueue.poll(5, TimeUnit.SECONDS);

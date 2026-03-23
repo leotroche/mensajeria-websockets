@@ -1,6 +1,6 @@
 package com.mensajeria.model.information.chat.message;
 
-import com.mensajeria.model.information.InformationPayload;
+import com.mensajeria.controller.dto.payload.InformationPayload;
 
 // es lo que se envía al user
 public record Message(

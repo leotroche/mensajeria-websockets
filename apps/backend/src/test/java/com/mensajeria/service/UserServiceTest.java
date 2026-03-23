@@ -69,7 +69,7 @@ public class UserServiceTest {
         UserInfo userInfo = userService.getUserInfo(loginResponse.getData().token());
 
         assertEquals("pepito", userInfo.getData().username());
-        assertEquals("3", userInfo.getData().userId()); // TODO si este test falla, puede ser por el 3 hardcodeado como id
+        assertEquals("3", userInfo.getData().userId()); // TODO si este test falla, puede ser por el 3 hardcodeado como chatId
     }
 
     @Test
@@ -80,7 +80,7 @@ public class UserServiceTest {
         UserInfo userInfo = userService.getUserInfo(loginResponse.getData().token());
 
         assertEquals("pepito", userInfo.getData().username());
-        assertEquals("3", userInfo.getData().userId()); // TODO si este test falla, puede ser por el 3 hardcodeado como id
+        assertEquals("3", userInfo.getData().userId()); // TODO si este test falla, puede ser por el 3 hardcodeado como chatId
     }
 
     @AfterEach

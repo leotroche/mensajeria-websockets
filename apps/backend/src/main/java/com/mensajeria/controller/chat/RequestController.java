@@ -2,7 +2,7 @@ package com.mensajeria.controller.chat;
 
 import com.mensajeria.controller.dto.payload.RequestSendPayload;
 import com.mensajeria.model.information.Information;
-import com.mensajeria.model.information.InformationPayload;
+import com.mensajeria.controller.dto.payload.InformationPayload;
 import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.model.information.chat.request.SendRequest;
 import com.mensajeria.service.RequestServiceImpl;
