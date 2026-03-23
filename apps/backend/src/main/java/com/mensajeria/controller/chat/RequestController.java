@@ -45,7 +45,7 @@ public class RequestController {
 
         System.out.println("Someone sent / answered a friend request to " + requestAcceptPayload.receiverId() + ":" + requestAcceptPayload);
 
-        Authentication authentication = jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
+        jwtUtils.validateAndGetAuthFromHeader(headerAccessor);
 
         InformationPayload request = requestService.getInformationForAcceptRequest(requestAcceptPayload);
 

@@ -10,7 +10,6 @@ import com.mensajeria.controller.dto.payload.RequestAcceptPayload;
 import com.mensajeria.model.information.chat.request.AcceptRequest;
 import com.mensajeria.model.information.chat.Chat;
 import com.mensajeria.model.information.chat.request.SendRequest;
-import com.mensajeria.model.information.contact.Contact;
 import com.mensajeria.utils.TestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test") // importante poner en TODOS los tests
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class RequestMessageControllerTests {
+public class RequestControllerTests {
 
     @LocalServerPort
     private int port;
@@ -185,9 +184,7 @@ public class RequestMessageControllerTests {
 
         StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-
-        Contact contact = new Contact("pepe", "pepe");
-        RequestSendData data = new RequestSendData("UUID", contact, 121424545L);
+        RequestSendData data = new RequestSendData("UUID", "pepe", "pepe", 121424545L);
         RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 
@@ -195,7 +192,7 @@ public class RequestMessageControllerTests {
         assertNotNull(response);
 
         SendRequest request = (SendRequest) response.payload();
-        assertEquals("pepe", request.sender().name());
+        assertEquals("pepe", request.sender().senderName());
     }
 
     @Test
@@ -203,9 +200,7 @@ public class RequestMessageControllerTests {
 
         StompHeaders sendHeaders = getStompHeadersForSend(pepeToken);
 
-
-        Contact contact = new Contact("pepe", "pepe");
-        RequestSendData data = new RequestSendData("UUID", contact, 121424545L);
+        RequestSendData data = new RequestSendData("UUID", "pepe", "pepe", 121424545L);
         RequestSendPayload requestSendPayload = new RequestSendPayload(data, "pepa");
         pepeSession.send(sendHeaders, requestSendPayload);
 

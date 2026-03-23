@@ -20,9 +20,9 @@ public record Information(
 
         )
         @JsonSubTypes({
-                @JsonSubTypes.Type(value = Message.class, name = "message"),
-                @JsonSubTypes.Type(value = SendRequest.class, name = "contact:request:sent"),
-                @JsonSubTypes.Type(value = AcceptRequest.class, name = "contact:request:accepted")
+                @JsonSubTypes.Type(value = Message.class, name = "message:received"),
+                @JsonSubTypes.Type(value = SendRequest.class, name = "request:received"),
+                @JsonSubTypes.Type(value = AcceptRequest.class, name = "request:accepted")
         })
         InformationPayload payload
 ) {
